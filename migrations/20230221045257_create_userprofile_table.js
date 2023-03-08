@@ -4,8 +4,9 @@
  */
 exports.up = function(knex) {
     return knex.schema.createTable('user_profile', function(table) {
-        table.increments();
+        table.increments('id');
         table.string('username');
+        table.string('name');
         table.integer('roleId');
         table.timestamps(true, true);
       });
