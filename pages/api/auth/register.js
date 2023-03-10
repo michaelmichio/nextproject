@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
     const { username, password, admkey } = req.body;
 
-    if(admkey !== process.env.ADM_KEY) res.status(403).end();
+    if(admkey !== process.env.ADM_KEY) return res.status(403).end();
 
     const registeredUser = await db('users').where({ username: username }).first();
     if(registeredUser) return res.status(409).end();
