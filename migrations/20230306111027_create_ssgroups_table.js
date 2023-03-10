@@ -4,7 +4,7 @@
  */
 exports.up = function(knex) {
     return knex.schema.createTable('ssgroups', function(table) {
-        table.increments('id');
+        table.string('id');
         table.string('orderId');
         table.timestamps(true, true);
       });

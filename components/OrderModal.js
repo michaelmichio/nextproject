@@ -354,22 +354,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                 </h6>
                                 <div className="mx-4">
                                     <div className="flex flex-wrap">
-                                        <div className="w-full lg:w-5/12 px-4">
-                                            <div className="relative w-full mb-3">
-                                            <label className="block uppercase text-gray-600 text-xs font-bold mb-2" >
-                                                
-                                            </label>
-                                            
-                                            </div>
-                                        </div>
-                                        <div className="w-full lg:w-5/12 px-4">
-                                            <div className="relative w-full mb-3">
-                                            <label className="block uppercase text-gray-600 text-xs font-bold mb-2" >
-                                                
-                                            </label>
-                                            
-                                            </div>
-                                        </div>
+                                        <div className="w-full lg:w-10/12 px-4" />
                                         <div className="w-full lg:w-2/12 px-4">
                                             <div className="relative w-full mb-3">
                                                 <label className="block uppercase text-gray-600 text-xs font-bold mb-2" >
@@ -397,18 +382,18 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                             </thead>
                                             <tbody className="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                                                 { ssGroupProps?.map((ssgroup, i) => (
-                                                    <tr key={ssgroup.id} onClick={() => {setSSGroupData(ssgroup), setVisibleSS(true)}} className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
+                                                    <tr key={ssgroup.id} className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
                                                         <td className="w-1/12 truncate ... px-4 py-3 text-sm">{ i+1 }</td>
                                                         <td className="w-3/12 truncate ... px-4 py-3 text-sm">{ ssgroup.id }</td>
                                                         <td className="w-3/12 truncate ... px-4 py-3 text-sm">{ ssgroup.created_at.substring(0, 10) }</td>
                                                         <td className="w-3/12 truncate ... px-4 py-3 text-sm">0</td>
                                                         <td className="truncate ... px-4 py-3 text-sm flex justify-end">
-                                                            <button type="button" className="mx-4 px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-blue-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
+                                                            <button onClick={() => {setSSGroupData(ssgroup), setVisibleSS(true)}} type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-blue-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>
                                                             </button>
-                                                            <button type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
+                                                            {/* <button type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                                                            </button>
+                                                            </button> */}
                                                         </td>
                                                     </tr>
                                                     ))
@@ -429,7 +414,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                             <label className="block uppercase text-gray-600 text-xs font-bold mb-2" >
                                                 Uraian Pekerjaan:
                                             </label>
-                                            <input required onChange={serviceFieldHandler.bind(this)} name="name" value={val.name} type="text" className="border-0 px-3 py-3 placeholder-gray-300 text-gray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" />
+                                            <input required autoComplete="off" onChange={serviceFieldHandler.bind(this)} name="name" value={val.name} type="text" className="border-0 px-3 py-3 placeholder-gray-300 text-gray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" />
                                             </div>
                                         </div>
                                         <div className="w-full lg:w-5/12 px-4">
@@ -437,7 +422,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                             <label className="block uppercase text-gray-600 text-xs font-bold mb-2" >
                                                 Biaya Pekerjaan:
                                             </label>
-                                            <input required onChange={serviceFieldHandler.bind(this)} name="price" value={val.price} type="text" className="border-0 px-3 py-3 placeholder-gray-300 text-gray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" />
+                                            <input required autoComplete="off" onChange={serviceFieldHandler.bind(this)} name="price" value={val.price} type="text" className="border-0 px-3 py-3 placeholder-gray-300 text-gray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" />
                                             </div>
                                         </div>
                                         <div className="w-full lg:w-2/12 px-4">
@@ -471,11 +456,11 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                                         <td className="w-4/12 truncate ... px-4 py-3 text-sm">{ service.name }</td>
                                                         <td className="w-4/12 truncate ... px-4 py-3 text-sm">{ service.price }</td>
                                                         <td className="px-4 py-3 text-sm flex justify-end">
-                                                            <button type="button" className="mx-4 px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-blue-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>
+                                                            <button type="button" className="mr-4 px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-blue-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>
                                                             </button>
                                                             <button type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                                                             </button>
                                                         </td>
                                                     </tr>

@@ -30,8 +30,7 @@ export default async function handler(req, res) {
         db('ssgroups').count('*').whereRaw('?? = ??', ['orders.id', 'ssgroups.orderId']).as('jumlahSS')
     )
     .join('customers', {'customers.id': 'orders.customerId'})
-
-    // const orders = await db().select('*').from('orders');
+    .orderBy('orderId', 'desc');
 
     res.status(200);
     res.json({

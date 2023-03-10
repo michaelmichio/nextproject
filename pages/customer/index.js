@@ -99,7 +99,7 @@ export default function CustomerIndex(props) {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-                  { props.customers.map(customer => (
+                  { props.customers?.map(customer => (
                       <tr key={ customer.id } className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
                         <td className="w-1/6 truncate ... px-4 py-3 text-sm">{ customer.id }</td>
                         <td className="w-1/6 truncate ... px-4 py-3 text-sm">{ customer.name }</td>
@@ -107,7 +107,7 @@ export default function CustomerIndex(props) {
                         <td className="w-1/6 truncate ... px-4 py-3 text-sm">{ customer.phone }</td>
                         <td className="w-1/6 truncate ... px-4 py-3 text-sm">{ customer.created_at.substring(0, 10) }</td>
                         <td className="px-4 py-3 text-sm flex justify-end">
-                          <button onClick={() => {setVisibleUpdate(true); setCustomerData(customer)}} type="button" className="mx-4 px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-blue-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
+                          <button onClick={() => {setVisibleUpdate(true); setCustomerData(customer)}} type="button" className="mr-4 px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-blue-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>
                           </button>
                           <button onClick={deleteHandler.bind(this, customer.id)} type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">

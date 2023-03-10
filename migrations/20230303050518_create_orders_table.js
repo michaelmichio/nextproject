@@ -4,7 +4,7 @@
  */
 exports.up = function(knex) {
     return knex.schema.createTable('orders', function(table) {
-        table.increments('id');
+        table.string('id');
         table.string('nomorPolisi');
         table.string('jenisKendaraan');
         table.string('nomorRangka');
