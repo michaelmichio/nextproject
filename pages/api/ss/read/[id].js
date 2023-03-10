@@ -10,8 +10,8 @@ export default async function handler(req, res) {
     .select(
         '*',
         db('ss').sum('itemTotalPrice').where('ssGroupId', id).as('total')
-        )
-        .where('ssGroupId', id);
+    )
+    .where('ssGroupId', id);
 
     res.status(200);
     res.json({

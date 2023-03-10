@@ -1,23 +1,27 @@
+import { useState } from "react";
+
 import { authPage } from "@/middlewares/authorizationPage";
 import Nav from "@/components/Nav";
 import Sidebar from "@/components/Sidebar";
 import CreateOrderModal from "@/components/CreateOrderModal";
 import UpdateOrderModal from "@/components/UpdateOrderModal";
 import OrderModal from "@/components/OrderModal";
-import { useState } from "react";
-import Router from "next/router";
 
 export async function getServerSideProps(ctx) {
+  
   const { token } = await authPage(ctx);
 
-  let orderReq = await fetch('http://localhost:3000/api/order', {
-      headers: {
-          'Authorization': 'Bearer ' + token
-      }
+  const orderReq = await fetch('http://localhost:3000/api/order', {
+    headers: {
+      'Authorization': 'Bearer ' + token
+    }
+  })
+  .catch((error) => {
+    console.log(error)
   });
-
+  
   const orders = await orderReq.json();
-
+  
   return {
     props: {
       token,
@@ -27,45 +31,49 @@ export async function getServerSideProps(ctx) {
 }
 
 export default function DashboardIndex(props) {
+
+  const { token } = props;
+
   const [createModal, setVisibleCreate] = useState(false);
   const [updateModal, setVisibleUpdate] = useState(false);
   const [orderModal, setVisibleOrder] = useState(false);
   const [orderData, setOrderData] = useState();
-
-  const { token } = props;
-
-  async function deleteHandler(id, e) {
-    e.stopPropagation();
-    e.preventDefault();
-
-    const { token } = props;
-
-    const ask = confirm('Apakah data ini akan dihapus?');
-
-    if(ask) {
-      const deleteOrder = await fetch('/api/order/delete/' + id, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': 'Bearer ' + token
-        }
-      });
-
-      const res = await deleteOrder.json();
-
-      Router.replace('/dashboard');
-    }
-  }
-
+  
+  // async function deleteHandler(id, e) {
+  //   e.stopPropagation();
+  //   e.preventDefault();
+    
+  //   const { token } = props;
+    
+  //   const ask = confirm('Apakah data ini akan dihapus?');
+    
+  //   if(ask) {
+  //     const deleteOrder = await fetch('/api/order/delete/' + id, {
+  //       method: 'DELETE',
+  //       headers: {
+  //         'Authorization': 'Bearer ' + token
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.log(error)
+  //     });
+      
+  //     const res = await deleteOrder.json();
+      
+  //     Router.replace('/dashboard');
+  //   }
+  // }
+  
   async function updateHandler(orders, e) {
     e.stopPropagation();
     e.preventDefault();
-
     setVisibleUpdate(true);
     setOrderData(orders);
   }
   
   return (
-    <div className="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white dark:bg-gray-700 text-black dark:text-white">
+
+  <div className="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white dark:bg-gray-700 text-black dark:text-white">
       
     <Nav />
     
@@ -74,7 +82,6 @@ export default function DashboardIndex(props) {
     <div className="h-full ml-14 mt-14 mb-10 md:ml-64">
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-
         <div onClick={() => setVisibleCreate(true)} className="cursor-pointer bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
           <div className="flex justify-center items-center w-7 h-7 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
             <svg className="stroke-current text-blue-800 dark:text-gray-800 transform transition-transform duration-500 ease-in-out" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -87,6 +94,7 @@ export default function DashboardIndex(props) {
 
       <div className="mt-4 mx-4">
         <div className="w-full overflow-hidden rounded-lg shadow-xs">
+
           <div className="w-full overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -111,7 +119,8 @@ export default function DashboardIndex(props) {
                       <td className="w-1/8 truncate ... px-4 py-3 text-sm">{ orders.orderCreatedAt.substring(0, 10) }</td>
                       <td className="w-1/8 truncate ... px-4 py-3 text-sm">{ orders.total }</td>
                       <td className="w-1/8 truncate ... px-4 py-3 text-xs">
-                        { orders.printCount == 0 ?
+                        {
+                        orders.printCount == 0 ?
                         <span className="px-2 py-1 font-semibold leading-tight text-amber-700 bg-amber-100 rounded-full dark:bg-amber-700 dark:text-amber-100">Belum Dicetak</span>
                         :
                         <span className="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">Sudah Dicetak</span>
@@ -134,10 +143,10 @@ export default function DashboardIndex(props) {
               </tbody>
             </table>
           </div>
+          
           <div className="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
             <span className="flex items-center col-span-3"></span>
             <span className="col-span-2"></span>
-            
             {/* <span className="flex col-span-4 mt-2 sm:mt-auto sm:justify-end">
               <nav aria-label="Table navigation">
                 <ul className="inline-flex items-center">
@@ -180,6 +189,7 @@ export default function DashboardIndex(props) {
               </nav>
             </span> */}
           </div>
+
         </div>
       </div>
       
@@ -192,6 +202,7 @@ export default function DashboardIndex(props) {
     <OrderModal isVisible={orderModal} onClose={() => setVisibleOrder(false)} orderData={orderData} token={token} />
 
   </div>
+
   );
 
 }

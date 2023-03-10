@@ -3,16 +3,15 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 export default async function handler(req, res) {
+
     if(req.method !== 'POST') return res.status(405).end();
 
     const { username, password } = req.body;
 
     const checkUser = await db('users').where({ username }).first();
-    
     if(!checkUser) return res.status(401).end();
 
     const checkPassword = await bcrypt.compare(password, checkUser.password);
-
     if(!checkPassword) return res.status(401).end();
 
     const token = jwt.sign({
@@ -27,4 +26,5 @@ export default async function handler(req, res) {
         message: 'Login successfully',
         token
     });
+    
 }

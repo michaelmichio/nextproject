@@ -13,8 +13,6 @@ export default async function handler(req, res) {
 
     const update = await db('items').where({ id }).update({ stock: updateValue});
 
-    const updatedData = await db('items').where({ id }).first();
-
     res.status(200);
     res.json({
         message: 'Item stock added successfully'

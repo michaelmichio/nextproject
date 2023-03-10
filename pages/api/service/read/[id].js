@@ -6,7 +6,12 @@ export default async function handler(req, res) {
 
     const { id } = req.query;
 
-    const services = await db('services').where('orderId', id);
+    const services = await db('services')
+    .select(
+        '*',
+        db('services').sum('price').where('OrderId', id).as('total')
+    )
+    .where('orderId', id);
 
     res.status(200);
     res.json({

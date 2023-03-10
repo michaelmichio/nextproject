@@ -1,22 +1,26 @@
+import { useState } from "react";
+import Router from "next/router";
+
 import { authPage } from "@/middlewares/authorizationPage";
 import Nav from "@/components/Nav";
 import Sidebar from "@/components/Sidebar";
 import CreateCustomerModal from "@/components/CreateCustomerModal";
 import UpdateCustomerModal from "@/components/UpdateCustomerModal";
-import { useState } from "react";
-import Router from "next/router";
 
 export async function getServerSideProps(ctx) {
   const { token } = await authPage(ctx);
 
   const customerReq = await fetch('http://localhost:3000/api/customer', {
-      headers: {
-          'Authorization': 'Bearer ' + token
-      }
+    headers: {
+      'Authorization': 'Bearer ' + token
+    }
+  })
+  .catch((error) => {
+    console.log(error)
   });
-
+  
   const customers = await customerReq.json();
-
+  
   return {
     props: {
       token,
@@ -26,36 +30,26 @@ export async function getServerSideProps(ctx) {
 }
 
 export default function CustomerIndex(props) {
-  // const [customers, setCustomers] = useState(props.customers);
+
+  const { token } = props;
+
   const [createModal, setVisibleCreate] = useState(false);
   const [updateModal, setVisibleUpdate] = useState(false);
   const [customerData, setCustomerData] = useState();
 
   async function deleteHandler(id, e) {
     e.preventDefault();
-    
-    const { token } = props;
-
     const ask = confirm('Apakah data ini akan dihapus?');
-
     if(ask) {
       const deleteCustomer = await fetch('/api/customer/delete/' + id, {
         method: 'DELETE',
         headers: {
           'Authorization': 'Bearer ' + token
         }
+      })
+      .catch((error) => {
+        console.log(error)
       });
-
-      const res = await deleteCustomer.json();
-
-      // const customersFiltered = customers.filter(customer => {
-      //   return customer.id !== id && customer;
-      // });
-
-      // setCustomers(customersFiltered);
-
-      // Router.push('/customer', null, { shallow: false });
-
       Router.replace('/customer');
     }
   }
@@ -71,7 +65,6 @@ export default function CustomerIndex(props) {
       <div className="h-full ml-14 mt-14 mb-10 md:ml-64">
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-
           <div onClick={() => setVisibleCreate(true)} className="cursor-pointer bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
             <div className="flex justify-center items-center w-7 h-7 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
               <svg className="stroke-current text-blue-800 dark:text-gray-800 transform transition-transform duration-500 ease-in-out" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -80,12 +73,11 @@ export default function CustomerIndex(props) {
               <p>Customer Baru</p>
             </div>
           </div>
-
         </div>
 
         <div className="mt-4 mx-4">
-          
           <div className="w-full overflow-hidden rounded-lg shadow-xs">
+
             <div className="w-full overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -120,10 +112,10 @@ export default function CustomerIndex(props) {
                 </tbody>
               </table>
             </div>
+
             <div className="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
               <span className="flex items-center col-span-3"></span>
               <span className="col-span-2"></span>
-              
               {/* <span className="flex col-span-4 mt-2 sm:mt-auto sm:justify-end">
                 <nav aria-label="Table navigation">
                   <ul className="inline-flex items-center">
@@ -166,8 +158,8 @@ export default function CustomerIndex(props) {
                 </nav>
               </span> */}
             </div>
+            
           </div>
-          
         </div>
         
       </div>
@@ -179,4 +171,5 @@ export default function CustomerIndex(props) {
     </div>
         
   );
+
 }

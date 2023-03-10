@@ -9,8 +9,6 @@ export default async function handler(req, res) {
 
     const update = await db('orders').where({ id }).update({ nomorPolisi, jenisKendaraan, nomorRangka, nomorMesin, nomorSPK });
 
-    const updatedData = await db('orders').where({ id }).first();
-
     res.status(200);
     res.json({
         message: 'Order updated successfully'

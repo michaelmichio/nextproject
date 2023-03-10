@@ -4,58 +4,54 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
 
     if(!isVisible) return null;
 
-    const [status, setStatus] = useState('normal');
-
-    // handler for close button
+    // close modal
     function closeHandler(e) {
         e.preventDefault();
         onClose();
     }
+
+    const [status, setStatus] = useState('normal');
 
     // read items
     const [itemProps, setItemProps] = useState();
     const [itemRead, setItemRead] = useState(false);
     if (!itemRead) readItemHandler();
     async function readItemHandler() {
-
         setItemRead(true);
-        
         const itemReq = await fetch('/api/item', {
             headers: {
                 'Authorization': 'Bearer ' + token
             }
+        })
+        .catch((error) => {
+            console.log(error)
         });
-        
         const items = await itemReq.json();
-        
         setItemProps(items.data);
     }
 
-    // read or update SS
+    // read or update ss
     const [ssProps, setSSProps] = useState();
     const [ssRead, setSSRead] = useState(false);
     if (!ssRead) readSSHandler();
     async function readSSHandler() {
-
         setSSRead(true);
-
         const readSSReq = await fetch('/api/ss/read/' + ssGroupData.id, {
             headers: {
                 'Authorization': 'Bearer ' + token
             }
+        })
+        .catch((error) => {
+            console.log(error)
         });
-    
         const readSSRes = await readSSReq.json();
-    
         setSSProps(readSSRes.data);
     }
 
-    // create SS handler
+    // create ss handler
     async function createSSHandler(e) {
         e.preventDefault();
-
         if(qtyValue > 0 && selectedItem) {
-            
             // create SS
             const createSSReq = await fetch('/api/ss/create', {
                 method: 'POST',
@@ -71,10 +67,11 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
                 headers: {
                     'Content-Type': 'application/json'
                 }
+            })
+            .catch((error) => {
+                console.log(error)
             });
-
             if(!createSSReq.ok) return setStatus('error' + createSSReq.status);
-
             // subtract item stock
             const updateItemReq = await fetch('/api/item/subtractStock/' + selectedItem.id, {
                 method: 'PUT',
@@ -84,37 +81,47 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
                 headers: {
                     'Content-Type': 'application/json'
                 }
+            })
+            .catch((error) => {
+                console.log(error)
             });
-
             if(!updateItemReq.ok) return setStatus('error' + updateItemReq.status);
-
+            // add ssgroup total price
+            const updateSSGroupReq = await fetch('/api/ssgroup/addTotalPrice/' + ssGroupData.id, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    ssTotalPrice: selectedItem.price * qtyValue
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            });
+            if(!updateSSGroupReq.ok) return setStatus('error' + updateSSGroupReq.status);
             setSSRead(false);
-
             setSelectedItem();
             setQtyValue("1");
         }
     }
 
-    // delete SS handler
+    // delete ss handler
     async function deleteSSHandler(selectedSS, e) {
         e.preventDefault();
-    
         const ask = confirm('Apakah data ini akan dihapus?');
-    
         if(ask) {
-
-            // delete SS
+            // delete ss
             const deleteItemReq = await fetch('/api/ss/delete/' + selectedSS.id, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': 'Bearer ' + token
                 }
+            })
+            .catch((error) => {
+                console.log(error)
             });
-
             if(!deleteItemReq.ok) return setStatus('error' + deleteItemReq.status);
-    
-            const res = await deleteItemReq.json();
-
             // add item stock
             const updateItemReq = await fetch('/api/item/addStock/' + selectedSS.itemId, {
                 method: 'PUT',
@@ -124,12 +131,25 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
                 headers: {
                     'Content-Type': 'application/json'
                 }
+            })
+            .catch((error) => {
+                console.log(error)
             });
-
             if(!updateItemReq.ok) return setStatus('error' + updateItemReq.status);
-
-            const updateItemRes = await updateItemReq.json();
-            
+            // update ssgroup total price
+            const updateSSGroupReq = await fetch('/api/ssgroup/subtractTotalPrice/' + ssGroupData.id, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    ssTotalPrice: selectedSS.itemTotalPrice
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            });
+            if(!updateSSGroupReq.ok) return setStatus('error' + updateSSGroupReq.status);
             setSSRead(false);
         }
     }
@@ -157,7 +177,7 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
     <>
 
     {/* Start - Modal */}
-    <div onClick={() => {setDisplaySearchItem("hidden"); setSearchItem("")}} className="min-h-full h-fit py-24 bg-black bg-opacity-5 transition duration-150 ease-in-out z-10 absolute top-0 right-0 bottom-0 left-0" id="modal">
+    <div onClick={() => {setDisplaySearchItem("hidden"); setSearchItem('')}} className="min-h-full h-fit py-24 bg-black bg-opacity-5 transition duration-150 ease-in-out z-10 absolute top-0 right-0 bottom-0 left-0" id="modal">
         <div role="alert" className="container mx-auto w-11/12 md:w-11/12">
             
             {/* Start - Card Container */}
@@ -230,7 +250,7 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
                                             Item:
                                         </label>
 
-                                        <button onClick={(e) => {e.stopPropagation(); (displaySearchItem == "hidden") ? setDisplaySearchItem("") : (setSearchItem(""), setDisplaySearchItem("hidden"))}} type="button" className="text-start border-0 px-3 py-3 placeholder-gray-300 text-gray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" id="grid-state">
+                                        <button onClick={(e) => {e.stopPropagation(); (displaySearchItem == "hidden") ? setDisplaySearchItem('') : (setSearchItem(''), setDisplaySearchItem("hidden"))}} type="button" className="text-start border-0 px-3 py-3 placeholder-gray-300 text-gray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" id="grid-state">
                                             <div className="h-full">{ (!selectedItem) ? <br/> : selectedItem.code + ' - ' + selectedItem.name }</div>
                                         </button>
                                         
@@ -246,7 +266,7 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
                                                 })
                                                 .slice(0, 5)
                                                 .map((item) => (
-                                                    <li key={item.id} onClick={() => {setSelectedItem(item); setSearchItem(""); setDisplaySearchItem("hidden")}}><p className="p-2 block text-black hover:bg-blue-500 hover:text-white cursor-pointer">{item.code + ' - ' + item.name}</p></li>
+                                                    <li key={item.id} onClick={() => {setSelectedItem(item); setSearchItem(''); setDisplaySearchItem("hidden")}}><p className="p-2 block text-black hover:bg-blue-500 hover:text-white cursor-pointer">{item.code + ' - ' + item.name}</p></li>
                                                 ))}
                                             </ul>
                                         </div>
@@ -347,10 +367,7 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
                                 <div className="w-full lg:w-2/12 px-4">
                                     <div className="relative w-full mb-3">
                                         <label className="block uppercase text-gray-600 text-sm mb-2" >
-                                            { ssProps?.map((ss, i) => (
-                                                    (i == 0) ? ss.total : ""
-                                                ))
-                                            }
+                                            {ssProps?.map((ss, i) => ((i == 0) ? ss.total : ''))}
                                         </label>
                                     </div>
                                 </div>
