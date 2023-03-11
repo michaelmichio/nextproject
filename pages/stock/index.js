@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Router from "next/router";
+import { ToastContainer, toast } from "react-toastify";
 
 import { authPage } from "@/middlewares/authorizationPage";
 import Nav from "@/components/Nav";
@@ -32,6 +33,18 @@ export async function getServerSideProps(ctx) {
 
 export default function StockIndex(props) {
 
+  const notifyInfo = (msg) => toast.info(msg, {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+    }
+  );
+
   const { token } = props;
 
   const [createModal, setVisibleCreate] = useState(false);
@@ -59,6 +72,8 @@ export default function StockIndex(props) {
 
   <div className="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white dark:bg-gray-700 text-black dark:text-white">
     
+    <ToastContainer />
+
     <Nav />
     
     <Sidebar />
@@ -165,7 +180,7 @@ export default function StockIndex(props) {
 
     <CreateItemModal isVisible={createModal} onClose={() => setVisibleCreate(false)} />
 
-    <UpdateItemModal isVisible={updateModal} onClose={() => setVisibleUpdate(false)} itemData={itemData} />
+    <UpdateItemModal isVisible={updateModal} onClose={() => setVisibleUpdate(false)} notifyInfo={(msg) => notifyInfo(msg)} itemData={itemData} />
 
   </div>
         

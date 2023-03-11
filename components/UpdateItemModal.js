@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Router from 'next/router';
 
-export default function UpdateItemModal({ isVisible, onClose, itemData }) {
+export default function UpdateItemModal({ isVisible, onClose, notifyInfo, itemData }) {
 
     if(!isVisible) return null;
 
@@ -32,6 +32,7 @@ export default function UpdateItemModal({ isVisible, onClose, itemData }) {
             console.log(error)
         });
         if(!updateItemReq.ok) return setStatus('error' + updateItemReq.status);
+        notifyInfo('Data berhasil diupdate');
         Router.replace('/stock');
         onClose();
     }

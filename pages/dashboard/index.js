@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
 
 import { authPage } from "@/middlewares/authorizationPage";
 import Nav from "@/components/Nav";
@@ -32,21 +33,36 @@ export async function getServerSideProps(ctx) {
 
 export default function DashboardIndex(props) {
 
+  const notifyInfo = (msg) => toast.info(msg, {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+    }
+  );
+
   const { token } = props;
 
   const [createModal, setVisibleCreate] = useState(false);
   const [updateModal, setVisibleUpdate] = useState(false);
   const [orderModal, setVisibleOrder] = useState(false);
   const [orderData, setOrderData] = useState();
+
+  async function updateHandler(orders, e) {
+    e.stopPropagation();
+    e.preventDefault();
+    setVisibleUpdate(true);
+    setOrderData(orders);
+  }
   
   // async function deleteHandler(id, e) {
   //   e.stopPropagation();
   //   e.preventDefault();
-    
-  //   const { token } = props;
-    
   //   const ask = confirm('Apakah data ini akan dihapus?');
-    
   //   if(ask) {
   //     const deleteOrder = await fetch('/api/order/delete/' + id, {
   //       method: 'DELETE',
@@ -57,23 +73,15 @@ export default function DashboardIndex(props) {
   //     .catch((error) => {
   //       console.log(error)
   //     });
-      
-  //     const res = await deleteOrder.json();
-      
   //     Router.replace('/dashboard');
   //   }
   // }
   
-  async function updateHandler(orders, e) {
-    e.stopPropagation();
-    e.preventDefault();
-    setVisibleUpdate(true);
-    setOrderData(orders);
-  }
-  
   return (
 
   <div className="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white dark:bg-gray-700 text-black dark:text-white">
+
+    <ToastContainer />
       
     <Nav />
     
@@ -197,7 +205,7 @@ export default function DashboardIndex(props) {
 
     <CreateOrderModal isVisible={createModal} onClose={() => setVisibleCreate(false)} />
 
-    <UpdateOrderModal isVisible={updateModal} onClose={() => setVisibleUpdate(false)} orderData={orderData} />
+    <UpdateOrderModal isVisible={updateModal} onClose={() => setVisibleUpdate(false)} notifyInfo={(msg) => notifyInfo(msg)} orderData={orderData} />
 
     <OrderModal isVisible={orderModal} onClose={() => setVisibleOrder(false)} orderData={orderData} token={token} />
 

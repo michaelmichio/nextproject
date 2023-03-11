@@ -1,5 +1,7 @@
 import { useState } from "react";
 import Router from "next/router";
+import { ToastContainer, toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 import { authPage } from "@/middlewares/authorizationPage";
 import Nav from "@/components/Nav";
@@ -31,6 +33,18 @@ export async function getServerSideProps(ctx) {
 
 export default function CustomerIndex(props) {
 
+  const notifyInfo = (msg) => toast.info(msg, {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+    }
+  );
+
   const { token } = props;
 
   const [createModal, setVisibleCreate] = useState(false);
@@ -39,25 +53,46 @@ export default function CustomerIndex(props) {
 
   async function deleteHandler(id, e) {
     e.preventDefault();
-    const ask = confirm('Apakah data ini akan dihapus?');
-    if(ask) {
-      const deleteCustomer = await fetch('/api/customer/delete/' + id, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': 'Bearer ' + token
-        }
-      })
-      .catch((error) => {
-        console.log(error)
-      });
-      Router.replace('/customer');
-    }
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire(
+          'Deleted!',
+          'Your file has been deleted.',
+          'success'
+        )
+        notifyInfo('Data berhasil dihapus');
+        deleteCustomer(id);
+      }
+    })
+  }
+  
+  async function deleteCustomer(id) {
+    const deleteCustomer = await fetch('/api/customer/delete/' + id, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    })
+    .catch((error) => {
+      console.log(error)
+    });
+    Router.replace('/customer');
   }
   
   return (
 
     <div className="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white dark:bg-gray-700 text-black dark:text-white">
       
+      <ToastContainer />
+
       <Nav />
       
       <Sidebar />
@@ -166,7 +201,7 @@ export default function CustomerIndex(props) {
 
       <CreateCustomerModal isVisible={createModal} onClose={() => setVisibleCreate(false)} />
 
-      <UpdateCustomerModal isVisible={updateModal} onClose={() => setVisibleUpdate(false)} customerData={customerData} />
+      <UpdateCustomerModal isVisible={updateModal} onClose={() => setVisibleUpdate(false)} notifyInfo={(msg) => notifyInfo(msg)} customerData={customerData} />
 
     </div>
         

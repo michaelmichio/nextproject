@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Router from 'next/router';
 
-export default function UpdateCustomerModal({ isVisible, onClose, customerData }) {
+export default function UpdateCustomerModal({ isVisible, onClose, notifyInfo, customerData }) {
 
     if(!isVisible) return null;
 
@@ -31,6 +31,7 @@ export default function UpdateCustomerModal({ isVisible, onClose, customerData }
             console.log(error)
         });
         if(!updateCustomerReq.ok) return setStatus('error' + updateCustomerReq.status);
+        notifyInfo('Data berhasil diupdate');
         Router.replace('/customer');
         onClose();
     }

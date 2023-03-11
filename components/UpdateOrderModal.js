@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Router from 'next/router';
 
-export default function UpdateOrderModal({ isVisible, onClose, orderData }) {
+export default function UpdateOrderModal({ isVisible, onClose, notifyInfo, orderData }) {
 
     if(!isVisible) return null;
 
@@ -33,6 +33,7 @@ export default function UpdateOrderModal({ isVisible, onClose, orderData }) {
             console.log(error)
         });
         if(!updateOrderReq.ok) return setStatus('error' + updateOrderReq.status);
+        notifyInfo('Data berhasil diupdate');
         Router.replace('/dashboard');
         onClose();
     }

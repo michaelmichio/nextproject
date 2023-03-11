@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import ReactToPrint from 'react-to-print';
 import SSModal from './SSModal';
+import ubahAngkaKeBahasa from 'angka-menjadi-terbilang';
 
 export default function OrderModal({ isVisible, onClose, orderData, token }) {
 
     if(!isVisible) return null;
+
+    const componentRef = useRef();
+    const d = new Date();
+
+    const terbilang = ubahAngkaKeBahasa;
 
     // ss modal
     const [ssModal, setVisibleSS] = useState(false);
@@ -108,6 +115,27 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
         setVal({
             [name]: e.target.value
         });
+    }
+
+    //----------------------------------------------------------------------------------------------------
+
+    // read or update ss
+    const [ssIdList, setSSIdList] = useState([]);
+    const [ssProps, setSSProps] = useState();
+    const [ssRead, setSSRead] = useState(false);
+    if (!ssRead) readSSHandler();
+    async function readSSHandler(id) {
+        setSSRead(true);
+        const readSSReq = await fetch('/api/ss/read/' + id, {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
+        .catch((error) => {
+            console.log(error)
+        });
+        const readSSRes = await readSSReq.json();
+        setSSProps(readSSRes.data);
     }
 
     return(
@@ -390,6 +418,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                                         </button> */}
                                                     </td>
                                                 </tr>
+                                                
                                                 ))
                                             }
                                         </tbody>
@@ -504,59 +533,11 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                     </label>
                                 </div>
                             </div>
-                            {/* <div className="w-full lg:w-10/12 px-4">
-                                <div className="relative w-full mb-3">
-                                    <label className="block uppercase text-gray-600 text-xs font-bold mb-2" >
-                                        Subtotal
-                                    </label>
-                                </div>
-                            </div>
-                            <div className="w-full lg:w-2/12 px-4">
-                                <div className="relative w-full mb-3">
-                                    <label className="block uppercase text-gray-600 text-sm mb-2" >
-                                        {
-                                        ((parseFloat(ssGroupProps?.map((ssGroup, i) => ((i == 0) ? ssGroup.total : ''))) + parseFloat(serviceProps?.map((service, i) => ((i == 0) ? service.total : '')))) > 0)
-                                        ?
-                                        (parseFloat(ssGroupProps?.map((ssGroup, i) => ((i == 0) ? ssGroup.total : ''))) + parseFloat(serviceProps?.map((service, i) => ((i == 0) ? service.total : ''))))
-                                        :
-                                        ''
-                                        }
-                                    </label>
-                                </div>
-                            </div> */}
                         </div>
 
                         <hr className="mb-6 border-b-1 border-gray-300"/>
 
                         <div className="flex flex-wrap">
-                            {/* <div className="w-full lg:w-10/12 px-4">
-                                <div className="relative w-full mb-3">
-                                    <label className="block uppercase text-gray-600 text-xs font-bold mb-2" >
-                                        Biaya Lainnya
-                                    </label>
-                                </div>
-                            </div>
-                            <div className="w-full lg:w-2/12 px-4">
-                                <div className="relative w-full mb-3">
-                                    <label className="block uppercase text-gray-600 text-sm mb-2" >
-                                        
-                                    </label>
-                                </div>
-                            </div>
-                            <div className="w-full lg:w-10/12 px-4">
-                                <div className="relative w-full mb-3">
-                                    <label className="block uppercase text-gray-600 text-xs font-bold mb-2" >
-                                        Discount
-                                    </label>
-                                </div>
-                            </div>
-                            <div className="w-full lg:w-2/12 px-4">
-                                <div className="relative w-full mb-3">
-                                    <label className="block uppercase text-gray-600 text-sm mb-2" >
-                                        
-                                    </label>
-                                </div>
-                            </div> */}
                             <div className="w-full lg:w-10/12 px-4">
                                 <div className="relative w-full mb-3">
                                     <label className="block uppercase text-gray-600 text-xs font-bold mb-2" >
@@ -588,9 +569,16 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                     <div className="rounded-t bg-white mb-0 px-3 py-3">
                         <div className="text-center flex justify-between">
                             <h6 className="text-gray-700 text-xl font-bold" />
-                            <button className="bg-green-500 text-white active:bg-green-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150" type="button">
-                                Cetak
-                            </button>
+                            <ReactToPrint
+                                trigger={() => {
+                                    return (
+                                        <button className="bg-green-500 text-white active:bg-green-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150" type="button">
+                                            Cetak
+                                        </button>
+                                    )
+                                }}
+                                content={() => componentRef.current}
+                            />
                         </div>
                     </div>
                     {/* End - Footer Card */}
@@ -604,6 +592,171 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
     {/* End - Modal */}
 
     <SSModal isVisible={ssModal} onClose={() => {setVisibleSS(false); setSSGroupRead(false);}} ssGroupData={ssGroupData} token={token} />
+
+    <div className='hidden'>
+        <div className='h-screen' ref={componentRef}>
+        
+        {ssGroupProps?.map(() => (
+            <div className='flex h-1/2 w-screen pt-6 pl-6 pr-6 bg-slate-500'>
+
+            </div>
+        ))}
+
+        <div className='flex flex-col h-1/2 w-screen pt-6 pl-6 pr-6 uppercase'>
+                
+            <div className='flex h-fit flex-row w-full'>
+                <div className='flex flex-col justify-end w-1/3 text-xs'>
+                    <div>PT. RADITA AUTOPRIMA</div>
+                    <div>JL. ABDULRACHMAN SALEH 64</div>
+                    <div>Telp : 022 6011217 . FAX : 022 6020938</div>
+                </div>
+                <div className='flex flex-col justify-end w-1/3 h-full text-center text-lg align-bottom font-bold'>
+                    KAISAR PLAZA
+                </div>
+                <div className='w-1/3' />
+            </div>
+
+            <hr className="border-1 border-black"/>
+
+            <div className='flex flex-row w-full'>
+                <div className='flex flex-row w-2/5 text-sm'>
+                    <div className='flex flex-col w-2/5'>
+                        <br></br>
+                        <div>NAMA CUSTOMER</div>
+                        <div>ALAMAT</div>
+                        <div>&nbsp;</div>
+                        <div>NO.TELP</div>
+                    </div>
+                    <div className='flex flex-col'>
+                        <br></br>
+                        <div>: {orderData.customerName}</div>
+                        <div>: {orderData.customerAddress}</div>
+                        <div>&nbsp;</div>
+                        <div>: {orderData.customerPhone}</div>
+                    </div>
+                </div>
+                <div className='flex flex-col w-1/5 h-full text-center text-lg align-bottom font-bold'>
+                    KWITANSI
+                </div>
+                <div className='flex flex-row justify-end w-2/5 text-sm'>
+                    <div className='flex flex-col mr-2'>
+                        <br></br>
+                        <div>NO.POLISI</div>
+                        <div>TYPE</div>
+                        <div>NO.RANGKA</div>
+                        <div>NO.MESIN</div>
+                    </div>
+                    <div className='flex flex-col w-1/2'>
+                        <br></br>
+                        <div>: {orderData.nomorPolisi}</div>
+                        <div>: {orderData.jenisKendaraan}</div>
+                        <div>: {orderData.nomorRangka}</div>
+                        <div>: {orderData.nomorMesin}</div>
+                    </div>
+                </div>
+            </div>
+
+            <hr className="border-1 border-black my-1"/>
+
+            <div className='flex justify-between text-sm'>
+                <div className='flex flex-row w-1/4'>
+                    <div>NO.SPK :&nbsp;</div>
+                    <div>{orderData.nomorSPK}</div>
+                </div>
+                <div className='flex flex-row w-1/4'>
+                    <div>KM :&nbsp;</div>
+                    <div></div>
+                </div>
+                <div className='flex flex-row w-1/4'>
+                    <div>SA/TEK :&nbsp;</div>
+                    <div>XXX XXX</div>
+                </div>
+                <div className='flex flex-row w-1/4'>
+                    <div>NO.KWITANSI :&nbsp;</div>
+                    <div>{orderData.orderId}</div>
+                </div>
+            </div>
+
+            <hr className="border-1 border-black my-1"/>
+
+            <div className='flex flex-row justify-between text-sm text-center'>
+                <div className='flex flex-col w-1/3'>
+                    <div className='font-bold'>*** URAIAN PEKERJAAN ***</div>
+                    {serviceProps?.map((service) => (<div>{service.name}</div>))}
+                </div>
+                <div className='flex flex-col w-1/3'>
+                    <div className='font-bold'>*** ONGKOS KERJA ***</div>
+                    {serviceProps?.map((service) => (<div>{service.price}</div>))}
+                </div>
+                <div className='flex flex-col w-1/3'>
+                    <div className='font-bold'>*** URAIAN BIAYA ***</div>
+                    <div className='flex flex-row'>
+                        <div className='w-1/2 text-start'>ONGKOS KERJA</div>
+                        <div className='w-1/2 text-end'>XX,XXX</div>
+                    </div>
+                    <div className='flex flex-row'>
+                        <div className='w-1/2 text-start'>SUKU CADANG/OLI</div>
+                        <div className='w-1/2 text-end'>XX,XXX</div>
+                    </div>
+                    <div className='flex flex-row'>
+                        <div className='w-1/2 text-start'>&nbsp;</div>
+                        <div className='w-1/2 text-end'>&nbsp;</div>
+                    </div>
+                    <div className='flex flex-row'>
+                        <div className='w-1/2 text-start'>&nbsp;</div>
+                        <div className='w-1/2 text-end'>&nbsp;</div>
+                    </div>
+                    <div className='flex flex-row'>
+                        <div className='w-1/2 text-start'>&nbsp;</div>
+                        <div className='w-1/2 text-end'>&nbsp;</div>
+                    </div>
+                    <div className='flex flex-row'>
+                        <div className='w-1/2 text-start'>&nbsp;</div>
+                        <div className='w-1/2 text-end'>&nbsp;</div>
+                    </div>
+                    <div className='flex flex-row'>
+                        <div className='w-1/2 text-start'>&nbsp;</div>
+                        <div className='w-1/2 text-end'>&nbsp;</div>
+                    </div>
+                    <div className='flex flex-row'>
+                        <div className='w-1/2 text-start font-bold'>TOTAL</div>
+                        <div className='w-1/2 text-end font-bold'>XX,XXX</div>
+                    </div>
+                </div>
+            </div>
+
+            <hr className="border-1 border-black my-1"/>
+            
+            <div className='flex flex-row text-sm'>
+
+                <div className='flex flex-col w-3/4'>
+                    <div className='flex flex-row'>
+                        <div className='w-1/2'>TOTAL ONGKOS KERJA PERBAIKAN</div>
+                        <div>XX,XXX</div>
+                    </div>
+                    <div className='flex flex-col'>
+                        <div>&nbsp;</div>
+                        <div>TERBILANG</div>
+                        <div className='font-bold'>{terbilang(40000) + ' RUPIAH'}</div>
+                    </div>
+                </div>
+
+                <div className='flex flex-col text-center'>
+                    <div>&nbsp;</div>
+                    <div>BANDUNG,&nbsp;{('0' + d.getDate()).slice(-2)+'/'+('0' + d.getMonth()).slice(-2)+'/'+d.getFullYear()}</div>
+                    <div>DIKERJAKAN OLEH</div>
+                    <div>&nbsp;</div>
+                    <div>&nbsp;</div>
+                    <div>&nbsp;</div>
+                    <div>KAISAR</div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    </div>
 
     </>
     );

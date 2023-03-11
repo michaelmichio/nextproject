@@ -128,3 +128,18 @@
       table-layout: fixed;
     }
 }
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  html, body {
+    width: 210mm;
+    height: 297mm;
+    font-family: "Serif";
+    font-size: 14px;
+  }
+  /* ... the rest of the rules ... */
+  
+}
