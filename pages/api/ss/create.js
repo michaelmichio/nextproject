@@ -4,7 +4,7 @@ export default async function handler(req, res) {
     
     if(req.method !== 'POST') return res.status(405).end();
 
-    const { itemId, itemCode, itemName, itemCount, itemPrice, itemTotalPrice, ssGroupId } = req.body;
+    const { itemId, itemCode, itemName, itemCount, itemPrice, itemTotalPrice, ssGroupId, orderId } = req.body;
 
     const createSS = await db('ss').insert({
         itemId,
@@ -13,7 +13,8 @@ export default async function handler(req, res) {
         itemCount,
         itemPrice,
         itemTotalPrice,
-        ssGroupId
+        ssGroupId,
+        orderId
     });
 
     res.status(200);

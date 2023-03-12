@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
+import CurrencyFormat from "react-currency-format";
 
 import { authPage } from "@/middlewares/authorizationPage";
 import Nav from "@/components/Nav";
@@ -113,7 +114,7 @@ export default function DashboardIndex(props) {
                   <th className="w-1/8 truncate ... px-4 py-3">Jumlah SS</th>
                   <th className="w-1/8 truncate ... px-4 py-3">Tanggal Order</th>
                   <th className="w-1/8 truncate ... px-4 py-3">Total Biaya</th>
-                  <th className="w-1/8 truncate ... px-4 py-3">Status</th>
+                  {/* <th className="w-1/8 truncate ... px-4 py-3">Status</th> */}
                   <th className="w-1/8 truncate ... px-4 py-3"></th>
                 </tr>
               </thead>
@@ -125,15 +126,15 @@ export default function DashboardIndex(props) {
                       <td className="w-1/8 truncate ... px-4 py-3 text-sm">{ orders.customerName }</td>
                       <td className="w-1/8 truncate ... px-4 py-3 text-sm">{ orders.jumlahSS }</td>
                       <td className="w-1/8 truncate ... px-4 py-3 text-sm">{ orders.orderCreatedAt.substring(0, 10) }</td>
-                      <td className="w-1/8 truncate ... px-4 py-3 text-sm">{ orders.total }</td>
-                      <td className="w-1/8 truncate ... px-4 py-3 text-xs">
+                      <td className="w-1/8 truncate ... px-4 py-3 text-sm">{ (orders.totalBiayaSS + orders.totalBiayaService > 0) ? <CurrencyFormat value={orders.totalBiayaSS + orders.totalBiayaService} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} /> : '0' }</td>
+                      {/* <td className="w-1/8 truncate ... px-4 py-3 text-xs">
                         {
                         orders.printCount == 0 ?
                         <span className="px-2 py-1 font-semibold leading-tight text-amber-700 bg-amber-100 rounded-full dark:bg-amber-700 dark:text-amber-100">Belum Dicetak</span>
                         :
                         <span className="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">Sudah Dicetak</span>
                         }
-                      </td>
+                      </td> */}
                       <td className="w-1/8 px-4 py-3 text-sm flex">
                         <button onClick={updateHandler.bind(this, orders)} type="button" className="mr-4 px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-blue-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>

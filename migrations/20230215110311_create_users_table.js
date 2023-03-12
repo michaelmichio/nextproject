@@ -7,6 +7,8 @@ exports.up = function(knex) {
     table.increments('id');
     table.string('username');
     table.string('password');
+    table.string('name');
+    table.integer('roleId');
     table.timestamps(true, true);
   });
 };

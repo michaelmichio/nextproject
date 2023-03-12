@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import CurrencyFormat from "react-currency-format";
+import Swal from "sweetalert2";
 
 export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
 
@@ -61,8 +63,9 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
                     itemName: selectedItem.name,
                     itemCount: qtyValue,
                     itemPrice: selectedItem.price,
-                    itemTotalPrice: selectedItem.price * qtyValue,
-                    ssGroupId : ssGroupData.id
+                    itemTotalPrice: qtyValue * selectedItem.price,
+                    ssGroupId: ssGroupData.id,
+                    orderId: ssGroupData.orderId
                 }),
                 headers: {
                     'Content-Type': 'application/json'
@@ -86,72 +89,62 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
                 console.log(error)
             });
             if(!updateItemReq.ok) return setStatus('error' + updateItemReq.status);
-            // add ssgroup total price
-            const updateSSGroupReq = await fetch('/api/ssgroup/addTotalPrice/' + ssGroupData.id, {
-                method: 'PUT',
-                body: JSON.stringify({
-                    ssTotalPrice: selectedItem.price * qtyValue
-                }),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .catch((error) => {
-                console.log(error)
-            });
-            if(!updateSSGroupReq.ok) return setStatus('error' + updateSSGroupReq.status);
             setSSRead(false);
             setSelectedItem();
             setQtyValue("1");
         }
     }
 
-    // delete ss handler
-    async function deleteSSHandler(selectedSS, e) {
+    async function deleteHandler(selectedSS, e) {
         e.preventDefault();
-        const ask = confirm('Apakah data ini akan dihapus?');
-        if(ask) {
-            // delete ss
-            const deleteItemReq = await fetch('/api/ss/delete/' + selectedSS.id, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': 'Bearer ' + token
-                }
-            })
-            .catch((error) => {
-                console.log(error)
-            });
-            if(!deleteItemReq.ok) return setStatus('error' + deleteItemReq.status);
-            // add item stock
-            const updateItemReq = await fetch('/api/item/addStock/' + selectedSS.itemId, {
-                method: 'PUT',
-                body: JSON.stringify({
-                    stock: selectedSS.itemCount
-                }),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .catch((error) => {
-                console.log(error)
-            });
-            if(!updateItemReq.ok) return setStatus('error' + updateItemReq.status);
-            // update ssgroup total price
-            const updateSSGroupReq = await fetch('/api/ssgroup/subtractTotalPrice/' + ssGroupData.id, {
-                method: 'PUT',
-                body: JSON.stringify({
-                    ssTotalPrice: selectedSS.itemTotalPrice
-                }),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .catch((error) => {
-                console.log(error)
-            });
-            if(!updateSSGroupReq.ok) return setStatus('error' + updateSSGroupReq.status);
-            setSSRead(false);
-        }
+        Swal.fire({
+            title: 'Hapus data?',
+            text: "Data tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, hapus!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+            Swal.fire(
+                'Terhapus!',
+                'Data berhasil dihapus.',
+                'success'
+            )
+            deleteSS(selectedSS);
+            }
+        })
+    }
+
+    // delete ss handler
+    async function deleteSS(selectedSS) {
+        // delete ss
+        const deleteItemReq = await fetch('/api/ss/delete/' + selectedSS.id, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
+        .catch((error) => {
+            console.log(error)
+        });
+        if(!deleteItemReq.ok) return setStatus('error' + deleteItemReq.status);
+        // add item stock
+        const updateItemReq = await fetch('/api/item/addStock/' + selectedSS.itemId, {
+            method: 'PUT',
+            body: JSON.stringify({
+                stock: selectedSS.itemCount
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .catch((error) => {
+            console.log(error)
+        });
+        if(!updateItemReq.ok) return setStatus('error' + updateItemReq.status);
+        setSSRead(false);
     }
 
     // quantity input handler
@@ -172,6 +165,8 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
     function searchItemHandler(e) {
         setSearchItem(e.target.value);
     }
+
+    let totalPrice = 0;
 
     return(
     <>
@@ -278,7 +273,7 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
                                         <label className="block uppercase text-gray-600 text-xs font-bold mb-2" >
                                             Qty:
                                         </label>
-                                        <input required autoComplete="off" onChange={itemFieldHandler.bind(this)} value={qtyValue} name="itemCount" type="number" min="1" className="border-0 px-3 py-3 placeholder-gray-300 text-gray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" />
+                                        <input required autoComplete="off" onChange={itemFieldHandler.bind(this)} value={qtyValue} name="itemCount" type="number" min="0" step='0.01' className="border-0 px-3 py-3 placeholder-gray-300 text-gray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" />
                                     </div>
                                 </div>
                                 <div className="w-full lg:w-2/12 px-4">
@@ -332,13 +327,13 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
                                                     <td className="w-2/12 truncate ... px-4 py-3 text-sm">{ ss.itemCode }</td>
                                                     <td className="w-2/12 truncate ... px-4 py-3 text-sm">{ ss.itemName }</td>
                                                     <td className="w-1/12 truncate ... px-4 py-3 text-sm">{ ss.itemCount }</td>
-                                                    <td className="w-2/12 truncate ... px-4 py-3 text-sm">{ ss.itemPrice }</td>
-                                                    <td className="w-2/12 truncate ... px-4 py-3 text-sm">{ ss.itemTotalPrice }</td>
+                                                    <td className="w-2/12 truncate ... px-4 py-3 text-sm"><CurrencyFormat value={ss.itemPrice} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} /></td>
+                                                    <td className="w-2/12 truncate ... px-4 py-3 text-sm"><CurrencyFormat value={ss.itemTotalPrice} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} /></td>
                                                     <td className="px-4 py-3 text-sm flex justify-end">
                                                         {/* <button type="button" className="mx-4 px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-blue-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>
                                                         </button> */}
-                                                        <button onClick={deleteSSHandler.bind(this, ss)} type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
+                                                        <button onClick={deleteHandler.bind(this, ss)} type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                                                         </button>
                                                     </td>
@@ -366,8 +361,9 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
                                 </div>
                                 <div className="w-full lg:w-2/12 px-4">
                                     <div className="relative w-full mb-3">
-                                        <label className="block uppercase text-gray-600 text-sm mb-2" >
-                                            {ssProps?.map((ss, i) => ((i == 0) ? ss.total : ''))}
+                                        <label className="block uppercase text-gray-600 text-sm mb-2 normal-case" >
+                                            {ssProps?.map((ss) => {totalPrice = totalPrice + ss.itemTotalPrice})}
+                                            <CurrencyFormat value={totalPrice} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} />
                                         </label>
                                     </div>
                                 </div>

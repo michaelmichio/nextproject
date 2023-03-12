@@ -12,11 +12,6 @@ export default async function handler(req, res) {
         'orders.nomorRangka',
         'orders.nomorMesin',
         'orders.nomorSPK',
-        'orders.ssFee',
-        'orders.serviceFee',
-        'orders.otherFee',
-        'orders.discount',
-        'orders.total',
         'orders.printCount',
         'orders.customerId',
         'orders.userId',
@@ -27,7 +22,9 @@ export default async function handler(req, res) {
         'customers.phone as customerPhone',
         'customers.created_at as customerCreatedAt',
         'customers.updated_at as customerUpdatedAt',
-        db('ssgroups').count('*').whereRaw('?? = ??', ['orders.id', 'ssgroups.orderId']).as('jumlahSS')
+        db('ssgroups').count('*').whereRaw('?? = ??', ['orders.id', 'ssgroups.orderId']).as('jumlahSS'),
+        db('ss').sum('itemTotalPrice').whereRaw('?? = ??', ['orders.id', 'ss.orderId']).as('totalBiayaSS'),
+        db('services').sum('price').whereRaw('?? = ??', ['orders.id', 'services.orderId']).as('totalBiayaService')
     )
     .join('customers', {'customers.id': 'orders.customerId'})
     .orderBy('orderId', 'desc');

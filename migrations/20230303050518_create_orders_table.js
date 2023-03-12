@@ -10,11 +10,6 @@ exports.up = function(knex) {
         table.string('nomorRangka');
         table.string('nomorMesin');
         table.string('nomorSPK');
-        table.float('ssFee', 14, 2);
-        table.float('serviceFee', 14, 2);
-        table.float('otherFee', 14, 2);
-        table.float('discount', 3, 2)
-        table.float('total', 14, 2);
         table.integer('printCount').notNullable().defaultTo('0');
         table.string('customerId');
         table.string('userId');

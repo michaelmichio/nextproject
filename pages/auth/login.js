@@ -29,6 +29,7 @@ export default function Login() {
         if(!loginReq.ok) return setLoginStatus('Pengguna tidak ditemukan');
         const loginRes = await loginReq.json();
         Cookie.set('token', loginRes.token);
+        Cookie.set('username', loginRes.username);
         Router.replace('/dashboard');
     }
 

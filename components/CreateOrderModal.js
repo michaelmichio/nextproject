@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Router from 'next/router';
+import Cookies from 'js-cookie';
 
 export default function CreateOrderModal({ isVisible, onClose }) {
 
@@ -18,13 +19,9 @@ export default function CreateOrderModal({ isVisible, onClose }) {
         nomorRangka: '',
         nomorMesin: '',
         nomorSPK: '',
-        ssFee: '0',
-        serviceFee: '0',
-        discount: '0',
-        total: '0',
         printCount: '0',
         customerId: '',
-        userId: '1',
+        userId: Cookies.get('username'),
     });
 
     async function createOrderHandler(e) {

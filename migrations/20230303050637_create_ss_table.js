@@ -8,10 +8,11 @@ exports.up = function(knex) {
         table.string('itemId');
         table.string('itemCode');
         table.string('itemName');
-        table.integer('itemCount');
+        table.float('itemCount', 14, 2);
         table.float('itemPrice', 14, 2);
         table.float('itemTotalPrice', 14, 2);
-        table.string('ssGroupId');
+        table.string('ssGroupId')
+        table.string('orderId');
         table.timestamps(true, true);
       });
 };

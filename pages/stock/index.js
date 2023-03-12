@@ -1,6 +1,8 @@
 import { useState } from "react";
 import Router from "next/router";
 import { ToastContainer, toast } from "react-toastify";
+import CurrencyFormat from 'react-currency-format';
+import Swal from "sweetalert2";
 
 import { authPage } from "@/middlewares/authorizationPage";
 import Nav from "@/components/Nav";
@@ -53,19 +55,37 @@ export default function StockIndex(props) {
 
   async function deleteHandler(id, e) {
     e.preventDefault();
-    const ask = confirm('Apakah data ini akan dihapus?');
-    if(ask) {
-      const deleteItem = await fetch('/api/item/delete/' + id, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': 'Bearer ' + token
-        }
-      })
-      .catch((error) => {
-        console.log(error)
-      });
-      Router.replace('/stock');
-    }
+    Swal.fire({
+      title: 'Hapus data?',
+      text: "Data tidak dapat dikembalikan!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Ya, hapus!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire(
+          'Terhapus!',
+          'Data berhasil dihapus.',
+          'success'
+        )
+        deleteItem(id);
+      }
+    })
+  }
+
+  async function deleteItem(id) {
+    const deleteItem = await fetch('/api/item/delete/' + id, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    })
+    .catch((error) => {
+      console.log(error)
+    });
+    Router.replace('/stock');
   }
 
   return (
@@ -100,7 +120,7 @@ export default function StockIndex(props) {
                 <tr className="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
                   <th className="w-1/5 truncate ... px-4 py-3">Kode</th>
                   <th className="w-1/5 truncate ... px-4 py-3">Nama</th>
-                  <th className="w-1/5 truncate ... px-4 py-3">Harga</th>
+                  <th className="w-1/5 truncate ... px-4 py-3">Harga Satuan</th>
                   <th className="w-1/5 truncate ... px-4 py-3">Jumlah</th>
                   <th className="truncate ... px-4 py-3"></th>
                 </tr>
@@ -110,7 +130,9 @@ export default function StockIndex(props) {
                     <tr key={ items.id } className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
                       <td className="w-1/5 truncate ... px-4 py-3 text-sm">{ items.code }</td>
                       <td className="w-1/5 truncate ... px-4 py-3 text-sm">{ items.name }</td>
-                      <td className="w-1/5 truncate ... px-4 py-3 text-sm">{ items.price }</td>
+                      <td className="w-1/5 truncate ... px-4 py-3 text-sm">
+                        <CurrencyFormat value={items.price} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} />
+                      </td>
                       <td className="w-1/5 truncate ... px-4 py-3 text-sm">{ items.stock }</td>
                       <td className="px-4 py-3 text-sm flex justify-end">
                         <button onClick={() => {setVisibleUpdate(true); setItemData(items)}} type="button" className="mr-4 px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-blue-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">

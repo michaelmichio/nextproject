@@ -1,7 +1,11 @@
 import React, { useState, useRef } from 'react';
+import Router from 'next/router';
 import ReactToPrint from 'react-to-print';
 import SSModal from './SSModal';
 import ubahAngkaKeBahasa from 'angka-menjadi-terbilang';
+import CurrencyFormat from 'react-currency-format';
+import Cookies from 'js-cookie';
+import Swal from "sweetalert2";
 
 export default function OrderModal({ isVisible, onClose, orderData, token }) {
 
@@ -9,7 +13,6 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
 
     const componentRef = useRef();
     const d = new Date();
-
     const terbilang = ubahAngkaKeBahasa;
 
     // ss modal
@@ -19,10 +22,29 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
     // close modal
     function closeHandler(e) {
         e.preventDefault();
+        Router.replace('/dashboard');
         onClose();
     }
     
     const [status, setStatus] = useState('normal');
+
+    // read users
+    const [userProps, setUserProps] = useState();
+    const [userRead, setUserRead] = useState(false);
+    if (!userRead) readUserHandler();
+    async function readUserHandler() {
+        setUserRead(true);
+        const readUserReq = await fetch('/api/user/read/' + Cookies.get('username'), {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
+        .catch((error) => {
+            console.log(error)
+        });
+        const readUserRes = await readUserReq.json();
+        setUserProps(readUserRes.data);
+    }
 
     // read ssgroups
     const [ssGroupProps, setSSGroupProps] = useState();
@@ -40,6 +62,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
         });
         const readSSGroupRes = await readSSGroupReq.json();
         setSSGroupProps(readSSGroupRes.data);
+        setSSRead(false);
     }
 
     // create ssgroup
@@ -55,7 +78,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
             console.log(error)
         });
         if(!createSSGroupReq.ok) return setStatus('error' + createSSGroupReq.status);
-        setSSGroupRead(false);
+        setSSGroupRead(false); // update read ssgroups
     }
 
     // read services
@@ -97,6 +120,60 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
         });
         if(!createServiceReq.ok) return setStatus('error' + createServiceReq.status);
         setVal(initialVal);
+        setServiceRead(false); // update read services
+    }
+    
+    const [ssProps, setSSProps] = useState();
+    const [ssRead, setSSRead] = useState(true);
+    if (!ssRead) readSSHandler();
+    async function readSSHandler() {
+        setSSRead(true);
+        const readSSReq = await fetch('/api/ss/order/' + orderData.orderId, {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
+        .catch((error) => {
+            console.log(error)
+        });
+        const readSSRes = await readSSReq.json();
+        setSSProps(readSSRes.data);
+    }
+
+    async function deleteHandler(id, e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Hapus data?',
+            text: "Data tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, hapus!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire(
+                    'Terhapus!',
+                    'Data berhasil dihapus.',
+                    'success'
+                )
+                deleteService(id);
+            }
+        })
+    }
+
+    // delete service handler
+    async function deleteService(id) {
+        // delete ss
+        const deleteServiceReq = await fetch('/api/service/delete/' + id, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
+        .catch((error) => {
+            console.log(error)
+        });
         setServiceRead(false);
     }
 
@@ -117,26 +194,10 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
         });
     }
 
-    //----------------------------------------------------------------------------------------------------
+    let totalSS = 0;
+    let totalService = 0;
 
-    // read or update ss
-    const [ssIdList, setSSIdList] = useState([]);
-    const [ssProps, setSSProps] = useState();
-    const [ssRead, setSSRead] = useState(false);
-    if (!ssRead) readSSHandler();
-    async function readSSHandler(id) {
-        setSSRead(true);
-        const readSSReq = await fetch('/api/ss/read/' + id, {
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        })
-        .catch((error) => {
-            console.log(error)
-        });
-        const readSSRes = await readSSReq.json();
-        setSSProps(readSSRes.data);
-    }
+    let totalSSGroupPrice = 0;
 
     return(
     <>
@@ -184,7 +245,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                             <div className="w-full lg:w-2/12 px-4">
                                 <div className="relative w-full mb-3">
                                     <label className="block uppercase text-gray-600 text-sm mb-2" >
-                                        SUSI
+                                        {(userProps !== undefined) ? userProps.name : ''}
                                     </label>
                                 </div>
                             </div>
@@ -396,9 +457,8 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                         <thead>
                                             <tr className="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
                                                 <th className="w-1/12 truncate ... px-4 py-3">No.</th>
-                                                <th className="w-3/12 truncate ... px-4 py-3">Nomor SS</th>
-                                                <th className="w-3/12 truncate ... px-4 py-3">Tanggal SS</th>
-                                                <th className="w-3/12 truncate ... px-4 py-3">Biaya SS</th>
+                                                <th className="w-5/12 truncate ... px-4 py-3">Nomor SS</th>
+                                                <th className="w-5/12 truncate ... px-4 py-3">Tanggal SS</th>
                                                 <th className="truncate ... px-4 py-3"></th>
                                             </tr>
                                         </thead>
@@ -406,9 +466,8 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                             { ssGroupProps?.map((ssgroup, i) => (
                                                 <tr key={ssgroup.id} className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
                                                     <td className="w-1/12 truncate ... px-4 py-3 text-sm">{ i+1 }</td>
-                                                    <td className="w-3/12 truncate ... px-4 py-3 text-sm">{ ssgroup.id }</td>
-                                                    <td className="w-3/12 truncate ... px-4 py-3 text-sm">{ ssgroup.created_at.substring(0, 10) }</td>
-                                                    <td className="w-3/12 truncate ... px-4 py-3 text-sm">{ ssgroup.ssTotalPrice }</td>
+                                                    <td className="w-5/12 truncate ... px-4 py-3 text-sm">{ ssgroup.id }</td>
+                                                    <td className="w-5/12 truncate ... px-4 py-3 text-sm">{ ssgroup.created_at.substring(0, 10) }</td>
                                                     <td className="truncate ... px-4 py-3 text-sm flex justify-end">
                                                         <button onClick={() => {setSSGroupData(ssgroup), setVisibleSS(true)}} type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-blue-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>
@@ -480,12 +539,14 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                                 <tr key={service.id} className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
                                                     <td className="w-1/12 truncate ... px-4 py-3 text-sm">{ i+1 }</td>
                                                     <td className="w-4/12 truncate ... px-4 py-3 text-sm">{ service.name }</td>
-                                                    <td className="w-4/12 truncate ... px-4 py-3 text-sm">{ service.price }</td>
+                                                    <td className="w-4/12 truncate ... px-4 py-3 text-sm">
+                                                        <CurrencyFormat value={service.price} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} />
+                                                    </td>
                                                     <td className="px-4 py-3 text-sm flex justify-end">
                                                         {/* <button type="button" className="mr-4 px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-blue-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>
                                                         </button> */}
-                                                        <button type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
+                                                        <button onClick={deleteHandler.bind(this, service.id)} type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                                                         </button>
                                                     </td>
@@ -514,8 +575,9 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                             </div>
                             <div className="w-full lg:w-2/12 px-4">
                                 <div className="relative w-full mb-3">
-                                    <label className="block uppercase text-gray-600 text-sm mb-2" >
-                                        {ssGroupProps?.map((ssGroup, i) => ((i == 0) ? ssGroup.total : ''))}
+                                    <label className="block uppercase text-gray-600 text-sm mb-2 normal-case" >
+                                        {ssProps?.map((ss) => {totalSS = totalSS + ss.itemTotalPrice})}
+                                        <CurrencyFormat value={totalSS} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} />
                                     </label>
                                 </div>
                             </div>
@@ -528,8 +590,9 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                             </div>
                             <div className="w-full lg:w-2/12 px-4">
                                 <div className="relative w-full mb-3">
-                                    <label className="block uppercase text-gray-600 text-sm mb-2" >
-                                        {serviceProps?.map((service, i) => ((i == 0) ? service.total : ''))}
+                                    <label className="block uppercase text-gray-600 text-sm mb-2 normal-case" >
+                                        {serviceProps?.map((service) => {totalService = totalService + service.price})}
+                                        <CurrencyFormat value={totalService} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} />
                                     </label>
                                 </div>
                             </div>
@@ -548,13 +611,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                             <div className="w-full lg:w-2/12 px-4">
                                 <div className="relative w-full mb-3">
                                     <label className="block uppercase text-gray-600 text-sm mb-2" >
-                                        {
-                                        ((parseFloat(ssGroupProps?.map((ssGroup, i) => ((i == 0) ? ssGroup.total : ''))) + parseFloat(serviceProps?.map((service, i) => ((i == 0) ? service.total : '')))) > 0)
-                                        ?
-                                        (parseFloat(ssGroupProps?.map((ssGroup, i) => ((i == 0) ? ssGroup.total : ''))) + parseFloat(serviceProps?.map((service, i) => ((i == 0) ? service.total : ''))))
-                                        :
-                                        ''
-                                        }
+                                        <CurrencyFormat value={totalSS + totalService} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} />
                                     </label>
                                 </div>
                             </div>
@@ -591,171 +648,290 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
     </div>
     {/* End - Modal */}
 
-    <SSModal isVisible={ssModal} onClose={() => {setVisibleSS(false); setSSGroupRead(false);}} ssGroupData={ssGroupData} token={token} />
+    <SSModal isVisible={ssModal} onClose={() => {setVisibleSS(false); setSSGroupRead(false); setSSRead(false);}} ssGroupData={ssGroupData} token={token} />
 
     <div className='hidden'>
-        <div className='h-screen' ref={componentRef}>
+        <div className='h-screen bg-white text-black' ref={componentRef}>
         
-        {ssGroupProps?.map(() => (
-            <div className='flex h-1/2 w-screen pt-6 pl-6 pr-6 bg-slate-500'>
+            {ssGroupProps?.map((ssgroup) => {
+                totalSSGroupPrice = 0;
+                return (
+                    <div className='flex flex-col h-1/2 w-screen pt-6 pl-6 pr-6 uppercase text-sm'>
+    
+                        <div className=''>LAMPIRAN SUKU CADANG & MATERIAL</div>
+    
+                        <div className='flex flex-row'>
+                            <div className='flex flex-row w-3/4'>
+                                <div className='flex flex-col w-1/6 normal-case'>
+                                    <div>Jenis Kendaraan</div>
+                                    <div>No. Polisi</div>
+                                    <div>Nama</div>
+                                    <div>Alamat</div>
+                                </div>
+                                <div className='flex flex-col w-5/6'>
+                                    <div>: {orderData.jenisKendaraan}</div>
+                                    <div>: {orderData.nomorPolisi}</div>
+                                    <div>: {orderData.customerName}</div>
+                                    <div>: {orderData.customerAddress}</div>
+                                </div>
+                            </div>
+                            <div className='flex flex-row w-1/4'>
+                                <div className='flex flex-col w-1/3 normal-case'>
+                                    <div>No. SPK</div>
+                                    <div>No. SS</div>
+                                    <div>Tanggal</div>
+                                    <div>Waktu</div>
+                                </div>
+                                <div className='flex flex-col w-2/3'>
+                                    <div>: {orderData.nomorSPK}</div>
+                                    <div>: {orderData.orderId}</div>
+                                    <div>: {('0' + d.getDate()).slice(-2)+'/'+('0' + d.getMonth()).slice(-2)+'/'+d.getFullYear()}</div>
+                                    <div>: {('0' + d.getHours()).slice(-2) +':'+ ('0' + d.getMinutes()).slice(-2) +':'+ ('0' + d.getSeconds()).slice(-2)}</div>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <hr className="border-1 border-dashed border-black mt-1"/>
+                        <hr className="border-1 border-dashed border-black my-1"/>
+    
+                        <div className='flex flex-row normal-case'>
+                            <div className='w-1/12'>No.</div>
+                            <div className='w-3/12'>Kode</div>
+                            <div className='w-3/12'>Nama</div>
+                            <div className='w-1/12'>Jumlah</div>
+                            <div className='w-2/12'>H.Satuan</div>
+                            <div className='w-2/12'>Total</div>
+                        </div>
+    
+                        <hr className="border-1 border-dashed border-black my-1"/>
+                        <hr className="border-1 border-dashed border-black mb-1"/>
+    
+                        {ssProps?.map((ss, i) => {
+                            if(ss.ssGroupId == ssgroup.id) {
+                                totalSSGroupPrice = totalSSGroupPrice + ss.itemTotalPrice;
+                                if(i + 1 == ssProps.length) {
+                                    return (
+                                        <div>
+                                            <div className='flex flex-row uppercase'>
+                                                <div className='w-1/12'>{i + 1}</div>
+                                                <div className='w-3/12'>{ss.itemCode}</div>
+                                                <div className='w-3/12'>{ss.itemName}</div>
+                                                <div className='w-1/12'>{ss.itemCount}</div>
+                                                <div className='w-2/12'><CurrencyFormat value={ss.itemPrice} displayType={'text'} thousandSeparator={true} prefix={''} /></div>
+                                                <div className='w-2/12'><CurrencyFormat value={ss.itemTotalPrice} displayType={'text'} thousandSeparator={true} prefix={''} /></div>
+                                            </div>
+    
+                                            <div className='flex flex-row justify-end pt-4'>
+                                                <div className='flex flex-col w-1/12'>
+                                                    <div>SUBTOTAL</div>
+                                                    <div>TOTAL</div>
+                                                </div>
+                                                <div className='flex flex-col w-2/12 text-center'>
+                                                    <div>{'--------->'}</div>
+                                                    <div>{'--------->'}</div>
+                                                </div>
+                                                <div className='flex flex-col w-2/12'>
+                                                    <div><CurrencyFormat value={totalSSGroupPrice} displayType={'text'} thousandSeparator={true} prefix={''} /></div>
+                                                    <div><CurrencyFormat value={totalSSGroupPrice} displayType={'text'} thousandSeparator={true} prefix={''} /></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                                else {
+                                    return (
+                                        <div>
+                                            <div className='flex flex-row uppercase'>
+                                                <div className='w-1/12'>{i + 1}</div>
+                                                <div className='w-3/12'>{ss.itemCode}</div>
+                                                <div className='w-3/12'>{ss.itemName}</div>
+                                                <div className='w-1/12'>{ss.itemCount}</div>
+                                                <div className='w-2/12'><CurrencyFormat value={ss.itemPrice} displayType={'text'} thousandSeparator={true} prefix={''} /></div>
+                                                <div className='w-2/12'><CurrencyFormat value={ss.itemTotalPrice} displayType={'text'} thousandSeparator={true} prefix={''} /></div>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                            }
+                            if(i + 1 == ssProps.length) {
+                                return (
+                                    <div className='flex flex-row justify-end pt-4'>
+                                        <div className='flex flex-col w-1/12'>
+                                            <div>SUBTOTAL</div>
+                                            <div>TOTAL</div>
+                                        </div>
+                                        <div className='flex flex-col w-2/12 text-center'>
+                                            <div>{'--------->'}</div>
+                                            <div>{'--------->'}</div>
+                                        </div>
+                                        <div className='flex flex-col w-2/12'>
+                                            <div><CurrencyFormat value={totalSSGroupPrice} displayType={'text'} thousandSeparator={true} prefix={''} /></div>
+                                            <div><CurrencyFormat value={totalSSGroupPrice} displayType={'text'} thousandSeparator={true} prefix={''} /></div>
+                                        </div>
+                                    </div>
+                                );
+                            }
+                        })}
+    
+                    </div>
+                    
+                );
+            })}
 
-            </div>
-        ))}
+            <div className='flex flex-col h-1/2 w-screen pt-6 pl-6 pr-6 uppercase'>
+                    
+                <div className='flex h-fit flex-row'>
+                    <div className='flex flex-col justify-end w-1/3 text-xs'>
+                        <div>PT. RADITA AUTOPRIMA</div>
+                        <div>JL. ABDULRACHMAN SALEH 64</div>
+                        <div>Telp : 022 6011217 . FAX : 022 6020938</div>
+                    </div>
+                    <div className='flex flex-col justify-end w-1/3 h-full text-center text-lg align-bottom font-bold'>
+                        KAISAR PLAZA
+                    </div>
+                    <div className='w-1/3' />
+                </div>
 
-        <div className='flex flex-col h-1/2 w-screen pt-6 pl-6 pr-6 uppercase'>
+                <hr className="border-1 border-black"/>
+
+                <div className='flex flex-row'>
+                    <div className='flex flex-row w-2/5 text-sm'>
+                        <div className='flex flex-col w-2/5'>
+                            <br></br>
+                            <div>NAMA CUSTOMER</div>
+                            <div>ALAMAT</div>
+                            <div>&nbsp;</div>
+                            <div>NO.TELP</div>
+                        </div>
+                        <div className='flex flex-col'>
+                            <br></br>
+                            <div>: {orderData.customerName}</div>
+                            <div>: {orderData.customerAddress}</div>
+                            <div>&nbsp;</div>
+                            <div>: {orderData.customerPhone}</div>
+                        </div>
+                    </div>
+                    <div className='flex flex-col w-1/5 h-full text-center text-lg align-bottom font-bold'>
+                        KWITANSI
+                    </div>
+                    <div className='flex flex-row justify-end w-2/5 text-sm'>
+                        <div className='flex flex-col mr-2'>
+                            <br></br>
+                            <div>NO.POLISI</div>
+                            <div>TYPE</div>
+                            <div>NO.RANGKA</div>
+                            <div>NO.MESIN</div>
+                        </div>
+                        <div className='flex flex-col w-1/2'>
+                            <br></br>
+                            <div>: {orderData.nomorPolisi}</div>
+                            <div>: {orderData.jenisKendaraan}</div>
+                            <div>: {orderData.nomorRangka}</div>
+                            <div>: {orderData.nomorMesin}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr className="border-1 border-black my-1"/>
+
+                <div className='flex justify-between text-sm'>
+                    <div className='flex flex-row w-1/4'>
+                        <div>NO.SPK :&nbsp;</div>
+                        <div>{orderData.nomorSPK}</div>
+                    </div>
+                    <div className='flex flex-row w-1/4'>
+                        <div>KM :&nbsp;</div>
+                        <div></div>
+                    </div>
+                    <div className='flex flex-row w-1/4'>
+                        <div>SA/TEK :&nbsp;</div>
+                        <div>{(userProps !== undefined) ? userProps.name : ''}</div>
+                    </div>
+                    <div className='flex flex-row w-1/4'>
+                        <div>NO.KWITANSI :&nbsp;</div>
+                        <div>{orderData.orderId}</div>
+                    </div>
+                </div>
+
+                <hr className="border-1 border-black my-1"/>
+
+                <div className='flex flex-row justify-between text-sm text-center'>
+                    <div className='flex flex-col w-1/3'>
+                        <div className='font-bold'>*** URAIAN PEKERJAAN ***</div>
+                        {serviceProps?.map((service) => (<div>{service.name}</div>))}
+                    </div>
+                    <div className='flex flex-col w-1/3'>
+                        <div className='font-bold'>*** ONGKOS KERJA ***</div>
+                        {serviceProps?.map((service) => (<div><CurrencyFormat value={service.price} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} /></div>))}
+                    </div>
+                    <div className='flex flex-col w-1/3'>
+                        <div className='font-bold'>*** URAIAN BIAYA ***</div>
+                        <div className='flex flex-row'>
+                            <div className='w-1/2 text-start'>ONGKOS KERJA</div>
+                            <div className='w-1/2 text-end'><CurrencyFormat value={totalService} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} /></div>
+                        </div>
+                        <div className='flex flex-row'>
+                            <div className='w-1/2 text-start'>SUKU CADANG/OLI</div>
+                            <div className='w-1/2 text-end'><CurrencyFormat value={totalSS} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} /></div>
+                        </div>
+                        <div className='flex flex-row'>
+                            <div className='w-1/2 text-start'>&nbsp;</div>
+                            <div className='w-1/2 text-end'>&nbsp;</div>
+                        </div>
+                        <div className='flex flex-row'>
+                            <div className='w-1/2 text-start'>&nbsp;</div>
+                            <div className='w-1/2 text-end'>&nbsp;</div>
+                        </div>
+                        <div className='flex flex-row'>
+                            <div className='w-1/2 text-start'>&nbsp;</div>
+                            <div className='w-1/2 text-end'>&nbsp;</div>
+                        </div>
+                        <div className='flex flex-row'>
+                            <div className='w-1/2 text-start'>&nbsp;</div>
+                            <div className='w-1/2 text-end'>&nbsp;</div>
+                        </div>
+                        <div className='flex flex-row'>
+                            <div className='w-1/2 text-start'>&nbsp;</div>
+                            <div className='w-1/2 text-end'>&nbsp;</div>
+                        </div>
+                        <div className='flex flex-row'>
+                            <div className='w-1/2 text-start font-bold'>TOTAL</div>
+                            <div className='w-1/2 text-end font-bold'><CurrencyFormat value={totalSS + totalService} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} /></div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr className="border-1 border-black my-1"/>
                 
-            <div className='flex h-fit flex-row w-full'>
-                <div className='flex flex-col justify-end w-1/3 text-xs'>
-                    <div>PT. RADITA AUTOPRIMA</div>
-                    <div>JL. ABDULRACHMAN SALEH 64</div>
-                    <div>Telp : 022 6011217 . FAX : 022 6020938</div>
-                </div>
-                <div className='flex flex-col justify-end w-1/3 h-full text-center text-lg align-bottom font-bold'>
-                    KAISAR PLAZA
-                </div>
-                <div className='w-1/3' />
-            </div>
+                <div className='flex flex-row text-sm'>
 
-            <hr className="border-1 border-black"/>
+                    <div className='flex flex-col w-3/4'>
+                        <div className='flex flex-row'>
+                            <div className='w-1/2'>TOTAL ONGKOS KERJA PERBAIKAN</div>
+                            <div><CurrencyFormat value={totalService} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} /></div>
+                        </div>
+                        <div className='flex flex-col'>
+                            <div>&nbsp;</div>
+                            <div>TERBILANG</div>
+                            <div className='font-bold'>{terbilang(totalSS + totalService) + ' RUPIAH'}</div>
+                        </div>
+                    </div>
 
-            <div className='flex flex-row w-full'>
-                <div className='flex flex-row w-2/5 text-sm'>
-                    <div className='flex flex-col w-2/5'>
-                        <br></br>
-                        <div>NAMA CUSTOMER</div>
-                        <div>ALAMAT</div>
+                    <div className='flex flex-col text-center'>
                         <div>&nbsp;</div>
-                        <div>NO.TELP</div>
-                    </div>
-                    <div className='flex flex-col'>
-                        <br></br>
-                        <div>: {orderData.customerName}</div>
-                        <div>: {orderData.customerAddress}</div>
+                        <div>BANDUNG,&nbsp;{('0' + d.getDate()).slice(-2)+'/'+('0' + d.getMonth()).slice(-2)+'/'+d.getFullYear()}</div>
+                        <div>DIKERJAKAN OLEH</div>
                         <div>&nbsp;</div>
-                        <div>: {orderData.customerPhone}</div>
-                    </div>
-                </div>
-                <div className='flex flex-col w-1/5 h-full text-center text-lg align-bottom font-bold'>
-                    KWITANSI
-                </div>
-                <div className='flex flex-row justify-end w-2/5 text-sm'>
-                    <div className='flex flex-col mr-2'>
-                        <br></br>
-                        <div>NO.POLISI</div>
-                        <div>TYPE</div>
-                        <div>NO.RANGKA</div>
-                        <div>NO.MESIN</div>
-                    </div>
-                    <div className='flex flex-col w-1/2'>
-                        <br></br>
-                        <div>: {orderData.nomorPolisi}</div>
-                        <div>: {orderData.jenisKendaraan}</div>
-                        <div>: {orderData.nomorRangka}</div>
-                        <div>: {orderData.nomorMesin}</div>
-                    </div>
-                </div>
-            </div>
-
-            <hr className="border-1 border-black my-1"/>
-
-            <div className='flex justify-between text-sm'>
-                <div className='flex flex-row w-1/4'>
-                    <div>NO.SPK :&nbsp;</div>
-                    <div>{orderData.nomorSPK}</div>
-                </div>
-                <div className='flex flex-row w-1/4'>
-                    <div>KM :&nbsp;</div>
-                    <div></div>
-                </div>
-                <div className='flex flex-row w-1/4'>
-                    <div>SA/TEK :&nbsp;</div>
-                    <div>XXX XXX</div>
-                </div>
-                <div className='flex flex-row w-1/4'>
-                    <div>NO.KWITANSI :&nbsp;</div>
-                    <div>{orderData.orderId}</div>
-                </div>
-            </div>
-
-            <hr className="border-1 border-black my-1"/>
-
-            <div className='flex flex-row justify-between text-sm text-center'>
-                <div className='flex flex-col w-1/3'>
-                    <div className='font-bold'>*** URAIAN PEKERJAAN ***</div>
-                    {serviceProps?.map((service) => (<div>{service.name}</div>))}
-                </div>
-                <div className='flex flex-col w-1/3'>
-                    <div className='font-bold'>*** ONGKOS KERJA ***</div>
-                    {serviceProps?.map((service) => (<div>{service.price}</div>))}
-                </div>
-                <div className='flex flex-col w-1/3'>
-                    <div className='font-bold'>*** URAIAN BIAYA ***</div>
-                    <div className='flex flex-row'>
-                        <div className='w-1/2 text-start'>ONGKOS KERJA</div>
-                        <div className='w-1/2 text-end'>XX,XXX</div>
-                    </div>
-                    <div className='flex flex-row'>
-                        <div className='w-1/2 text-start'>SUKU CADANG/OLI</div>
-                        <div className='w-1/2 text-end'>XX,XXX</div>
-                    </div>
-                    <div className='flex flex-row'>
-                        <div className='w-1/2 text-start'>&nbsp;</div>
-                        <div className='w-1/2 text-end'>&nbsp;</div>
-                    </div>
-                    <div className='flex flex-row'>
-                        <div className='w-1/2 text-start'>&nbsp;</div>
-                        <div className='w-1/2 text-end'>&nbsp;</div>
-                    </div>
-                    <div className='flex flex-row'>
-                        <div className='w-1/2 text-start'>&nbsp;</div>
-                        <div className='w-1/2 text-end'>&nbsp;</div>
-                    </div>
-                    <div className='flex flex-row'>
-                        <div className='w-1/2 text-start'>&nbsp;</div>
-                        <div className='w-1/2 text-end'>&nbsp;</div>
-                    </div>
-                    <div className='flex flex-row'>
-                        <div className='w-1/2 text-start'>&nbsp;</div>
-                        <div className='w-1/2 text-end'>&nbsp;</div>
-                    </div>
-                    <div className='flex flex-row'>
-                        <div className='w-1/2 text-start font-bold'>TOTAL</div>
-                        <div className='w-1/2 text-end font-bold'>XX,XXX</div>
-                    </div>
-                </div>
-            </div>
-
-            <hr className="border-1 border-black my-1"/>
-            
-            <div className='flex flex-row text-sm'>
-
-                <div className='flex flex-col w-3/4'>
-                    <div className='flex flex-row'>
-                        <div className='w-1/2'>TOTAL ONGKOS KERJA PERBAIKAN</div>
-                        <div>XX,XXX</div>
-                    </div>
-                    <div className='flex flex-col'>
                         <div>&nbsp;</div>
-                        <div>TERBILANG</div>
-                        <div className='font-bold'>{terbilang(40000) + ' RUPIAH'}</div>
+                        <div>&nbsp;</div>
+                        <div>KAISAR</div>
                     </div>
-                </div>
 
-                <div className='flex flex-col text-center'>
-                    <div>&nbsp;</div>
-                    <div>BANDUNG,&nbsp;{('0' + d.getDate()).slice(-2)+'/'+('0' + d.getMonth()).slice(-2)+'/'+d.getFullYear()}</div>
-                    <div>DIKERJAKAN OLEH</div>
-                    <div>&nbsp;</div>
-                    <div>&nbsp;</div>
-                    <div>&nbsp;</div>
-                    <div>KAISAR</div>
                 </div>
 
             </div>
 
         </div>
-
-    </div>
     </div>
 
     </>

@@ -6,12 +6,12 @@ export default async function handler(req, res) {
 
     const { id } = req.query;
 
-    const services = await db('services').where('orderId', id);
+    const ssRead = await db('ss').where('orderId', id);
 
     res.status(200);
     res.json({
-        message: 'Services data',
-        data: services
+        message: 'SS data',
+        data: ssRead
     });
 
 }
