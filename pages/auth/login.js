@@ -29,7 +29,7 @@ export default function Login() {
         if(!loginReq.ok) return setLoginStatus('Pengguna tidak ditemukan');
         const loginRes = await loginReq.json();
         Cookie.set('token', loginRes.token);
-        Cookie.set('username', loginRes.username);
+        Cookie.set('username', loginRes.userData.name);
         Router.replace('/dashboard');
     }
 
@@ -48,62 +48,35 @@ export default function Login() {
 
     return(
     
-    <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-lg">
-            
-            <form
-            onSubmit={loginHandler.bind(this)}
-            action=""
-            className="mt-6 mb-0 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8"
-            >
-                <p className="text-center text-lg font-medium">Masuk ke dalam akun anda</p>
-                
-                <div>
-                    <label className="sr-only">Username</label>
-                    <div className="relative">
-                        <input
-                        required
-                        onChange={fieldHandler.bind(this)}
-                        name="username"
-                        type="text"
-                        className="w-full rounded-lg border-gray-200 p-4 pr-12 text-sm shadow-sm"
-                        placeholder="Enter username"
-                        />
-                    </div>
+        <section className="flex flex-col md:flex-row h-screen items-center">
+            <div className="bg-sky-800 hidden lg:block w-full md:w-1/2 xl:w-2/3 h-screen">
+                {/* <img src="https://source.unsplash.com/random" alt="" className="w-full h-full object-cover"/> */}
+            </div>
+            <div className="bg-white w-full md:max-w-md lg:max-w-full md:mx-auto md:mx-0 md:w-1/2 xl:w-1/3 h-screen px-6 lg:px-16 xl:px-12 flex items-center justify-center">
+                <div className="w-full h-100">
+                    <h1 className="text-xl md:text-2xl font-bold leading-tight mt-12">Log in to your account</h1>
+                    <form className="mt-6" onSubmit={loginHandler.bind(this)}>
+                        <div>
+                            <label className="block text-gray-700">Username</label>
+                            <input onChange={fieldHandler.bind(this)} type="text" name="username" placeholder="Enter Username" className="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autoFocus autoComplete="true" required/>
+                        </div>
+                        <div className="mt-4">
+                            <label className="block text-gray-700">Password</label>
+                            <input onChange={fieldHandler.bind(this)} type="password" name="password" placeholder="Enter Password" minLength="6" className="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" required/>
+                        </div>
+                        <div className="text-center text-red-500 mt-6">
+                            {(loginStatus == '') ? <br/> : loginStatus }
+                        </div>
+                        {/* <div className="text-right mt-2">
+                            <a href="#" className="text-sm font-semibold text-gray-700 hover:text-blue-700 focus:text-blue-700">Forgot Password?</a>
+                        </div> */}
+                        <button type="submit" className="w-full block bg-sky-700 hover:bg-sky-600 focus:bg-sky-600 text-white font-semibold rounded-lg px-4 py-3 mt-6">Log In</button>
+                    </form>
+                    <hr className="my-6 border-gray-300 w-full"/>
+                    <p className="mt-8"><Link href="/auth/register" className="text-sky-600 hover:text-sky-700 font-semibold">Register an account</Link></p>
                 </div>
-                
-                <div>
-                    <label className="sr-only">Password</label>
-                    <div className="relative">
-                        <input
-                        required
-                        onChange={fieldHandler.bind(this)}
-                        name="password"
-                        type="password"
-                        className="w-full rounded-lg border-gray-200 p-4 pr-12 text-sm shadow-sm"
-                        placeholder="Enter password"
-                        />
-                    </div>
-                </div>
-
-                <p className="text-center text-sm text-red-500">
-                    {(loginStatus == '') ? <br/> : loginStatus }
-                </p>
-                
-                <button
-                type="submit"
-                className="block w-full rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white"
-                >
-                    Masuk
-                </button>
-                
-                <p className="text-center text-sm text-gray-500">
-                    <Link className="underline" href="/auth/register">Daftar</Link>
-                </p>
-            </form>
-        
-        </div>
-    </div>
+            </div>
+        </section>
 
     );
 

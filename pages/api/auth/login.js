@@ -14,6 +14,8 @@ export default async function handler(req, res) {
     const checkPassword = await bcrypt.compare(password, checkUser.password);
     if(!checkPassword) return res.status(401).end();
 
+    const userData = await db('users').select('name').where({ username }).first();
+
     const token = jwt.sign({
         id: checkUser.id,
         username: checkUser.username
@@ -25,7 +27,7 @@ export default async function handler(req, res) {
     res.json({
         message: 'Login successfully',
         token,
-        username
+        userData
     });
     
 }

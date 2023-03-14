@@ -2,9 +2,19 @@ import React, { useState } from 'react';
 import CurrencyFormat from "react-currency-format";
 import Swal from "sweetalert2";
 
-export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
+export default function SSModal({ isVisible, onClose, ssGroupData, token, orderData }) {
 
     if(!isVisible) return null;
+
+    const [isReadPrinted, setIsReadPrinted] = useState(false);
+    const [isPrinted, setIsPrinted] = useState(true);
+    if(!isReadPrinted) updatePrinted();
+    function updatePrinted() {
+        setIsReadPrinted(true);
+        if(orderData.printCount < 1) {
+            setIsPrinted(false);
+        }
+    }
 
     // close modal
     function closeHandler(e) {
@@ -237,7 +247,7 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
 
                             <hr className="mb-6 border-b-1 border-gray-300"/>
 
-                            <form onSubmit={createSSHandler.bind(this)} className="flex flex-wrap">
+                            <form onSubmit={createSSHandler.bind(this)} className={(isPrinted) ? "flex flex-wrap hidden" : "flex flex-wrap"}>
                                 <div className="w-full lg:w-5/12 px-4">
                                     <div className="relative w-full mb-3">
                                         
@@ -257,7 +267,7 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
                                                     const fullCode = item.code.toLowerCase();
                                                     const fullName = item.name.toLowerCase();
 
-                                                    return searchItem && fullCode.startsWith(filterName) || searchItem && fullName.startsWith(filterName);
+                                                    return searchItem && fullCode.includes(filterName) || searchItem && fullName.includes(filterName);
                                                 })
                                                 .slice(0, 5)
                                                 .map((item) => (
@@ -298,7 +308,7 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
                                             <br/>
                                         </label>
                                         <div className="text-center flex justify-end px-2 py-2">
-                                            <button type="submit" className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150">
+                                            <button type="submit" className="bg-sky-700 hover:bg-sky-600 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150">
                                                 Tambah
                                             </button>
                                         </div>
@@ -333,7 +343,7 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token }) {
                                                         {/* <button type="button" className="mx-4 px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-blue-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>
                                                         </button> */}
-                                                        <button onClick={deleteHandler.bind(this, ss)} type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
+                                                        <button onClick={deleteHandler.bind(this, ss)} type="button" className={(isPrinted) ? "px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300 hidden" : "px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300"}>
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                                                         </button>
                                                     </td>

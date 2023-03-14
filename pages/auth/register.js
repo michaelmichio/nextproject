@@ -35,6 +35,7 @@ export default function Register() {
     const [fields, setFields] = useState({
         username: '',
         password: '',
+        name:'',
         admkey: ''
     });
 
@@ -55,13 +56,14 @@ export default function Register() {
             action=""
             className="mt-6 mb-0 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8"
             >
-                <p className="text-center text-lg font-medium">Daftarkan akun anda</p>
+                <p className="text-center text-lg font-medium">Create an account</p>
                 
                 <div>
                     <label className="sr-only">Username</label>
                     <div className="relative">
                         <input
                         required
+                        autoComplete="off"
                         onChange={fieldHandler.bind(this)}
                         name="username"
                         type="text"
@@ -76,11 +78,27 @@ export default function Register() {
                     <div className="relative">
                         <input
                         required
+                        autoComplete="new-password"
                         onChange={fieldHandler.bind(this)}
                         name="password"
                         type="password"
                         className="w-full rounded-lg border-gray-200 p-4 pr-12 text-sm shadow-sm"
                         placeholder="Enter password"
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <label className="sr-only">Name</label>
+                    <div className="relative">
+                        <input
+                        required
+                        autoComplete="off"
+                        onChange={fieldHandler.bind(this)}
+                        name="name"
+                        type="text"
+                        className="w-full rounded-lg border-gray-200 p-4 pr-12 text-sm shadow-sm"
+                        placeholder="Enter name"
                         />
                     </div>
                 </div>
@@ -108,11 +126,11 @@ export default function Register() {
                 type="submit"
                 className="block w-full rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white"
                 >
-                    Daftar
+                    Register
                 </button>
                 
                 <p className="text-center text-sm text-gray-500">
-                    <Link className="underline" href="/auth/login">Masuk</Link>
+                    <Link className="underline" href="/auth/login">Log in</Link>
                 </p>
             </form>
         

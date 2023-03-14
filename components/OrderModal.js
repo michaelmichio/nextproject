@@ -11,6 +11,16 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
 
     if(!isVisible) return null;
 
+    const [isReadPrinted, setIsReadPrinted] = useState(false);
+    const [isPrinted, setIsPrinted] = useState(true);
+    if(!isReadPrinted) updatePrinted();
+    function updatePrinted() {
+        setIsReadPrinted(true);
+        if(orderData.printCount < 1) {
+            setIsPrinted(false);
+        }
+    }
+
     const componentRef = useRef();
     const d = new Date();
     const terbilang = ubahAngkaKeBahasa;
@@ -51,6 +61,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
     const [ssGroupRead, setSSGroupRead] = useState(false);
     if (!ssGroupRead) readSSGroupHandler();
     async function readSSGroupHandler() {
+
         setSSGroupRead(true);
         const readSSGroupReq = await fetch('/api/ssgroup/read/' + orderData.orderId, {
             headers: {
@@ -199,6 +210,50 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
 
     let totalSSGroupPrice = 0;
 
+    function updateHandler(id, e) {
+        e.preventDefault();
+        Swal.fire({
+          title: 'Selesaikan order?',
+          text: "Order tidak dapat diubah!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Ya, selesai!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Swal.fire(
+              'Selesai!',
+              'Order telah selesai.',
+              'success'
+            )
+            updateOrder(id);
+          }
+        })
+    }
+    
+    async function updateOrder(id) {
+        const updateOrderReq = await fetch('/api/order/update/' + orderData.orderId, {
+            method: 'PUT',
+            body: JSON.stringify({
+                nomorPolisi: orderData.nomorPolisi,
+                jenisKendaraan: orderData.jenisKendaraan,
+                nomorRangka: orderData.nomorRangka,
+                nomorMesin: orderData.nomorMesin,
+                nomorSPK: orderData.nomorSPK,
+                printCount: '1'
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .catch((error) => {
+            console.log(error)
+        });
+        Router.replace('/dashboard');
+        onClose();
+    }
+
     return(
     <>
 
@@ -245,7 +300,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                             <div className="w-full lg:w-2/12 px-4">
                                 <div className="relative w-full mb-3">
                                     <label className="block uppercase text-gray-600 text-sm mb-2" >
-                                        {(userProps !== undefined) ? userProps.name : ''}
+                                        {(orderData !== undefined) ? orderData.userId : ''}
                                     </label>
                                 </div>
                             </div>
@@ -443,8 +498,8 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                         <label className="block uppercase text-gray-600 text-xs font-bold mb-2" >
                                             <br/>
                                         </label>
-                                        <div className="text-center flex justify-end px-2 py-2">
-                                            <button onClick={() => createSSGroupHandler()} type="button" className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150">
+                                        <div className={(isPrinted) ? "text-center flex justify-end px-2 py-2 hidden" : "text-center flex justify-end px-2 py-2"}>
+                                            <button onClick={() => createSSGroupHandler()} type="button" className="bg-sky-700 hover:bg-sky-600 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150">
                                                 Tambah
                                             </button>
                                         </div>
@@ -469,7 +524,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                                     <td className="w-5/12 truncate ... px-4 py-3 text-sm">{ ssgroup.id }</td>
                                                     <td className="w-5/12 truncate ... px-4 py-3 text-sm">{ ssgroup.created_at.substring(0, 10) }</td>
                                                     <td className="truncate ... px-4 py-3 text-sm flex justify-end">
-                                                        <button onClick={() => {setSSGroupData(ssgroup), setVisibleSS(true)}} type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-blue-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
+                                                        <button onClick={() => {setSSGroupData(ssgroup), setVisibleSS(true)}} type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-sky-700 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>
                                                         </button>
                                                         {/* <button type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
@@ -493,7 +548,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                         </h6>
 
                         <div className="mt-4 mx-4">
-                            <form onSubmit={createServiceHandler.bind(this)} className="flex flex-wrap">
+                            <form onSubmit={createServiceHandler.bind(this)} className={(isPrinted) ? "flex flex-wrap hidden" : "flex flex-wrap"}>
                                 <div className="w-full lg:w-5/12 px-4">
                                     <div className="relative w-full mb-3">
                                     <label className="block uppercase text-gray-600 text-xs font-bold mb-2" >
@@ -516,7 +571,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                             <br/>
                                         </label>
                                         <div className="text-center flex justify-end px-2 py-2">
-                                            <button type="submit" className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150">
+                                            <button type="submit" className="bg-sky-700 hover:bg-sky-600 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150">
                                                 Tambah
                                             </button>
                                         </div>
@@ -546,7 +601,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                                         {/* <button type="button" className="mr-4 px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-blue-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>
                                                         </button> */}
-                                                        <button onClick={deleteHandler.bind(this, service.id)} type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
+                                                        <button onClick={deleteHandler.bind(this, service.id)} type="button" className={(isPrinted) ? "px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300 hidden" : "px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300"}>
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                                                         </button>
                                                     </td>
@@ -626,16 +681,24 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                     <div className="rounded-t bg-white mb-0 px-3 py-3">
                         <div className="text-center flex justify-between">
                             <h6 className="text-gray-700 text-xl font-bold" />
-                            <ReactToPrint
+                            <div>
+                                {(orderData.printCount < 1) ?
+                                <button onClick={updateHandler.bind(this, orderData.id)} className="bg-green-500 hover:bg-green-600 text-white active:bg-green-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150" type="button">
+                                    Selesai
+                                </button>
+                                :
+                                <ReactToPrint
                                 trigger={() => {
                                     return (
-                                        <button className="bg-green-500 text-white active:bg-green-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150" type="button">
+                                        <button className="bg-green-500 hover:bg-green-600 text-white active:bg-green-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150" type="button">
                                             Cetak
                                         </button>
                                     )
                                 }}
                                 content={() => componentRef.current}
-                            />
+                                />
+                                }
+                            </div>
                         </div>
                     </div>
                     {/* End - Footer Card */}
@@ -648,7 +711,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
     </div>
     {/* End - Modal */}
 
-    <SSModal isVisible={ssModal} onClose={() => {setVisibleSS(false); setSSGroupRead(false); setSSRead(false);}} ssGroupData={ssGroupData} token={token} />
+    <SSModal isVisible={ssModal} onClose={() => {setVisibleSS(false); setSSGroupRead(false); setSSRead(false);}} ssGroupData={ssGroupData} token={token} orderData={orderData} />
 
     <div className='hidden'>
         <div className='h-screen bg-white text-black' ref={componentRef}>
@@ -845,7 +908,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                     </div>
                     <div className='flex flex-row w-1/4'>
                         <div>SA/TEK :&nbsp;</div>
-                        <div>{(userProps !== undefined) ? userProps.name : ''}</div>
+                        <div>{(orderData !== undefined) ? orderData.userId : ''}</div>
                     </div>
                     <div className='flex flex-row w-1/4'>
                         <div>NO.KWITANSI :&nbsp;</div>
