@@ -13,7 +13,7 @@ export async function getServerSideProps(ctx) {
   
   const { token } = await authPage(ctx);
 
-  const orderReq = await fetch('http://localhost:3000/api/order', {
+  const orderReq = await fetch('/api/order', {
     headers: {
       'Authorization': 'Bearer ' + token
     }
