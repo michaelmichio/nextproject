@@ -12,7 +12,7 @@ import UpdateCustomerModal from "@/components/UpdateCustomerModal";
 export async function getServerSideProps(ctx) {
   const { token } = await authPage(ctx);
 
-  const customerReq = await fetch('/api/customer', {
+  const customerReq = await fetch('http://localhost:3000/api/customer', {
     headers: {
       'Authorization': 'Bearer ' + token
     }
