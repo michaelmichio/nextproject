@@ -9,7 +9,7 @@ export default async function handler(req, res) {
 
     if(admkey !== process.env.ADM_KEY) return res.status(403).end();
 
-    const registeredUser = await db('users').where({ username: username }).first();
+    const registeredUser = await db('users').where({ username: username.toLowerCase() }).first();
     if(registeredUser) return res.status(409).end();
 
     const salt = bcrypt.genSaltSync(10);
