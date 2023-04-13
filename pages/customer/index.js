@@ -56,24 +56,46 @@ export default function CustomerIndex(props) {
   async function deleteHandler(id, e) {
     e.preventDefault();
     Swal.fire({
-      title: 'Hapus data?',
-      text: "Data tidak dapat dikembalikan!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Ya, hapus!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire(
-          'Terhapus!',
-          'Data berhasil dihapus.',
-          'success'
-        )
-        deleteCustomer(id);
+      title: 'Hapus data',
+      html: `<input autoComplete="new-password" type="password" id="password" class="swal2-input" placeholder="Admin key">`,
+      confirmButtonText: 'Hapus',
+      focusConfirm: false,
+      preConfirm: () => {
+        const password = Swal.getPopup().querySelector('#password').value
+        if (!password) {
+          Swal.showValidationMessage(`Invalid admin key`)
+        }
+        return { password: password }
       }
+    }).then((result) => {
+      try {
+        adminKey(id, result.value.password);
+      } catch {}
     })
   }
+
+  async function adminKey(id, key) {
+    const keyCheck = await fetch('/api/adminkey', {
+      method: 'POST',
+      body: JSON.stringify({
+        key: key
+      }),
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      }
+    })
+    .catch((error) => {
+      console.log(error)
+    });
+    if(!keyCheck.ok) return Swal.fire(
+      'Admin key salah!',
+      'Data gagal dihapus.',
+      'error'
+    );
+    deleteCustomer(id);
+  }
+
   
   async function deleteCustomer(id) {
     const deleteCustomer = await fetch('/api/customer/delete/' + id, {
@@ -86,6 +108,11 @@ export default function CustomerIndex(props) {
       console.log(error)
     });
     Router.replace('/customer');
+    Swal.fire(
+      'Terhapus!',
+      'Data berhasil dihapus.',
+      'success'
+    )
   }
 
   const [page, setPage] = useState('0');
@@ -117,7 +144,7 @@ export default function CustomerIndex(props) {
               <div className="box-wrapper">
                   <div className=" bg-white rounded flex items-center w-full p-3 shadow-sm border border-gray-200">
                     <button className="outline-none focus:outline-none"><svg className=" w-5 text-gray-600 h-5 cursor-pointer" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
-                    <input onChange={searchItemHandler.bind(this)} type="search" name="" id="" placeholder="search for customers" x-model="q" className="w-full pl-4 text-sm outline-none focus:outline-none bg-transparent"/>
+                    <input autoComplete="off" onChange={searchItemHandler.bind(this)} type="search" name="" id="" placeholder="search for customers" x-model="q" className="w-full pl-4 text-sm outline-none focus:outline-none bg-transparent"/>
                     {/* <div className="select">
                       <select name="" id="" x-model="image_type" className="text-sm outline-none focus:outline-none bg-transparent">
                         <option value="all" selected>All</option>
@@ -176,9 +203,9 @@ export default function CustomerIndex(props) {
                           <button onClick={() => {setVisibleUpdate(true); setCustomerData(customer)}} type="button" className="mr-4 px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-sky-700 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>
                           </button>
-                          {/* <button onClick={deleteHandler.bind(this, customer.id)} type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
+                          <button onClick={deleteHandler.bind(this, customer.id)} type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                          </button> */}
+                          </button>
                         </td>
                       </tr>
                     ))

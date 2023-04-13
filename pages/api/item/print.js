@@ -4,8 +4,6 @@ export default async function handler(req, res) {
     
     if(req.method !== 'POST') return res.status(405).end();
 
-    console.log("aaaa");
-
     const { start, end } = req.body;
 
     console.log(start + " + " + end);
@@ -14,8 +12,6 @@ export default async function handler(req, res) {
     .where('created_at', '>=', start + 'T00:00:00Z')
     .where('created_at', '<', end + 'T23:59:59Z')
     .orderBy('name', 'asc');
-
-    console.log(items);
 
     res.status(200);
     res.json({

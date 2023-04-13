@@ -6,13 +6,11 @@ export default async function handler(req, res) {
 
     const { id } = req.query;
 
-    console.log(req.params);
-
-    const deleteRow = await db('items').where({ id }).del();
+    const deleteRow = await db('ssgroups').where({ id }).del();
 
     res.status(200);
     res.json({
-        message: 'Item deleted successfully'
+        message: 'SSGroup deleted successfully'
     });
 
 }

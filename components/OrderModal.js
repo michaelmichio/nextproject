@@ -254,6 +254,43 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
         onClose();
     }
 
+    async function deleteSSGroupHandler(id, e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Hapus data?',
+            text: "Data tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, hapus!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire(
+                    'Terhapus!',
+                    'Data berhasil dihapus.',
+                    'success'
+                )
+                deleteSSGroup(id);
+            }
+        })
+    }
+
+    // delete service handler
+    async function deleteSSGroup(id) {
+        // delete ss
+        const deleteServiceReq = await fetch('/api/ssgroup/delete/' + id, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
+        .catch((error) => {
+            console.log(error)
+        });
+        setSSGroupRead(false);
+    }
+
     return(
     <>
 
@@ -498,7 +535,12 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                         <label className="block uppercase text-gray-600 text-xs font-bold mb-2" >
                                             <br/>
                                         </label>
-                                        <div className={(isPrinted) ? "text-center flex justify-end px-2 py-2 hidden" : "text-center flex justify-end px-2 py-2"}>
+                                        <div className={
+                                            (isPrinted) ?
+                                            "text-center flex justify-end px-2 py-2 hidden"
+                                            :
+                                            ssGroupProps?.length > 0 ? "text-center flex justify-end px-2 py-2 hidden" : "text-center flex justify-end px-2 py-2"
+                                            }>
                                             <button onClick={() => createSSGroupHandler()} type="button" className="bg-sky-700 hover:bg-sky-600 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150">
                                                 Tambah
                                             </button>
@@ -512,8 +554,8 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                         <thead>
                                             <tr className="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
                                                 <th className="w-1/12 truncate ... px-4 py-3">No.</th>
-                                                <th className="w-5/12 truncate ... px-4 py-3">Nomor SS</th>
-                                                <th className="w-5/12 truncate ... px-4 py-3">Tanggal SS</th>
+                                                <th className="w-4/12 truncate ... px-4 py-3">Nomor SS</th>
+                                                <th className="w-4/12 truncate ... px-4 py-3">Tanggal SS</th>
                                                 <th className="truncate ... px-4 py-3"></th>
                                             </tr>
                                         </thead>
@@ -521,15 +563,15 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                             { ssGroupProps?.map((ssgroup, i) => (
                                                 <tr key={ssgroup.id} className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
                                                     <td className="w-1/12 truncate ... px-4 py-3 text-sm">{ i+1 }</td>
-                                                    <td className="w-5/12 truncate ... px-4 py-3 text-sm">{ ssgroup.id }</td>
-                                                    <td className="w-5/12 truncate ... px-4 py-3 text-sm">{ ssgroup.created_at.substring(0, 10) }</td>
+                                                    <td className="w-4/12 truncate ... px-4 py-3 text-sm">{ ssgroup.id }</td>
+                                                    <td className="w-4/12 truncate ... px-4 py-3 text-sm">{ ssgroup.created_at.substring(0, 10) }</td>
                                                     <td className="truncate ... px-4 py-3 text-sm flex justify-end">
                                                         <button onClick={() => {setSSGroupData(ssgroup), setVisibleSS(true)}} type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-sky-700 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>
                                                         </button>
-                                                        {/* <button type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
+                                                        <button onClick={deleteSSGroupHandler.bind(this, ssgroup.id)} type="button" className="ml-4 px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                                                        </button> */}
+                                                        </button>
                                                     </td>
                                                 </tr>
                                                 

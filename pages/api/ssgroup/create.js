@@ -6,8 +6,9 @@ export default async function handler(req, res) {
 
     const { orderId } = req.body;
 
-    const d = new Date();
-    const id = '33' + ('0' + d.getYear()).slice(-2) + ('0' + d.getMonth()).slice(-2) + ('0' + d.getDate()).slice(-2) + ('0' + d.getHours()).slice(-2) + ('0' + d.getMinutes()).slice(-2) + ('0' + d.getSeconds()).slice(-2) + ('00' + d.getMilliseconds()).slice(-3);
+    // const d = new Date();
+    // const id = '3' + ('0' + d.getYear()).slice(-2) + ('0' + d.getMonth()).slice(-2) + ('0' + d.getDate()).slice(-2) + ('0' + d.getHours()).slice(-2) + ('0' + d.getMinutes()).slice(-2) + ('0' + d.getSeconds()).slice(-2);
+    const id = orderId;
     
     const createSSGroup = await db('ssgroups').insert({
         id,

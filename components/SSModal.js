@@ -85,11 +85,15 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token, orderD
                 console.log(error)
             });
             if(!createSSReq.ok) return setStatus('error' + createSSReq.status);
+            const createSSRes = await createSSReq.json();
+            const id2data = createSSRes.data;
             // subtract item stock
             const updateItemReq = await fetch('/api/item/subtractStock/' + selectedItem.id, {
                 method: 'PUT',
                 body: JSON.stringify({
-                    stock: qtyValue
+                    stock: qtyValue,
+                    orderId: orderData.orderId,
+                    itemId: id2data.maxId
                 }),
                 headers: {
                     'Content-Type': 'application/json'
@@ -144,7 +148,8 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token, orderD
         const updateItemReq = await fetch('/api/item/addStock/' + selectedSS.itemId, {
             method: 'PUT',
             body: JSON.stringify({
-                stock: selectedSS.itemCount
+                stock: selectedSS.itemCount,
+                id2: selectedSS.id
             }),
             headers: {
                 'Content-Type': 'application/json'

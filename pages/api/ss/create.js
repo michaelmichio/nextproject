@@ -17,9 +17,12 @@ export default async function handler(req, res) {
         orderId
     });
 
+    const id2 = await db('ss').max('id as maxId').first();
+
     res.status(200);
     res.json({
-        message: 'SS registered successfully'
+        message: 'SS registered successfully',
+        data: id2
     });
 
 }

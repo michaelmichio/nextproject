@@ -57,29 +57,53 @@ export default function StockIndex(props) {
 
   async function deleteHandler(id, e) {
     e.preventDefault();
+
     Swal.fire({
-      title: 'Hapus data?',
-      text: "Data tidak dapat dikembalikan!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Ya, hapus!'
+      title: 'Hapus data',
+      html: `<input autoComplete="new-password" type="password" id="password" class="swal2-input" placeholder="Admin key">`,
+      confirmButtonText: 'Hapus',
+      focusConfirm: false,
+      preConfirm: () => {
+        const password = Swal.getPopup().querySelector('#password').value
+        if (!password) {
+          Swal.showValidationMessage(`Invalid admin key`)
+        }
+        return { password: password }
+      }
     }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire(
-          'Terhapus!',
-          'Data berhasil dihapus.',
-          'success'
-        )
-        deleteItem(id);
+      try {
+        adminKey(id, result.value.password);
+      } catch {}
+    })
+  }
+
+  async function adminKey(id, key) {
+    const keyCheck = await fetch('/api/adminkey', {
+      method: 'POST',
+      body: JSON.stringify({
+        key: key
+      }),
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
       }
     })
+    .catch((error) => {
+      console.log(error)
+    });
+    if(!keyCheck.ok) return Swal.fire(
+      'Admin key salah!',
+      'Data gagal dihapus.',
+      'error'
+    );
+    deleteItem(id);
   }
 
   async function deleteItem(id) {
     const deleteItem = await fetch('/api/item/delete/' + id, {
       method: 'DELETE',
+      body: JSON.stringify({
+    }),
       headers: {
         'Authorization': 'Bearer ' + token
       }
@@ -88,6 +112,11 @@ export default function StockIndex(props) {
       console.log(error)
     });
     Router.replace('/stock');
+    Swal.fire(
+      'Terhapus!',
+      'Data berhasil dihapus.',
+      'success'
+    )
   }
 
   const [page, setPage] = useState('0');
@@ -119,7 +148,7 @@ export default function StockIndex(props) {
             <div className="box-wrapper">
                 <div className=" bg-white rounded flex items-center w-full p-3 shadow-sm border border-gray-200">
                   <button className="outline-none focus:outline-none"><svg className=" w-5 text-gray-600 h-5 cursor-pointer" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
-                  <input onChange={searchItemHandler.bind(this)} type="search" name="" id="" placeholder="search for items" x-model="q" className="w-full pl-4 text-sm outline-none focus:outline-none bg-transparent"/>
+                  <input autoComplete="off" onChange={searchItemHandler.bind(this)} type="search" name="" id="" placeholder="search for items" x-model="q" className="w-full pl-4 text-sm outline-none focus:outline-none bg-transparent"/>
                   {/* <div className="select">
                     <select name="" id="" x-model="image_type" className="text-sm outline-none focus:outline-none bg-transparent">
                       <option value="all" selected>All</option>
