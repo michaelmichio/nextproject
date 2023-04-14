@@ -6,12 +6,7 @@ export default async function handler(req, res) {
 
     const { start, end } = req.body;
 
-    console.log(start + " + " + end);
-
-    const items = await db('items')
-    .where('created_at', '>=', start + 'T00:00:00Z')
-    .where('created_at', '<', end + 'T23:59:59Z')
-    .orderBy('name', 'asc');
+    const items = await db('item_logs').where('created_at', '>=', start + 'T00:00:00Z').where('created_at', '<', end + 'T23:59:59Z');
 
     res.status(200);
     res.json({

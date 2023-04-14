@@ -47,35 +47,62 @@ export default function ReportIndex(props) {
         end: strToday
     });
 
+    const [data, setData] = useState([]);
+    const [headers, setHeaders] = useState([]);
+    const [readData, setReadData] = useState(true);
+
     function fieldHandler(e) {
         const name = e.target.getAttribute('name');
         setFields({
             ...fields,
             [name]: e.target.value
         });
+        printReportHandler();
+
     }
 
-    async function printReportHandler(e) {
-        e.preventDefault();
+    if(readData) printReportHandler();
+
+    async function printReportHandler() {
+        setReadData(false);
         
-        const reportReq = await fetch('/api/item/print', {
-            method: 'POST',
-            body: JSON.stringify({
-                start : fields.start,
-                end: fields.end
-            }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .catch((error) => {
-            console.log(error)
-        });
-        if(!reportReq.ok) return setStatus('error' + reportReq.status);
+        if(fields.type == 'stock') {
+            setHeaders([
+                { label: "ID Barang", key: "id" },
+                { label: "Kode Barang", key: "item_code" },
+                { label: "Nama Barang", key: "item_name" },
+                { label: "Jumlah Awal", key: "initial_qty" },
+                { label: "Jumlah Berubah", key: "qty" },
+                { label: "Jumlah Akhir", key: "updated_qty" },
+                { label: "Harga Satuan", key: "price" },
+                { label: "Harga Total", key: "total_price" },
+                { label: "ID Penjualan", key: "order_id" },
+                { label: "ID Pembelian", key: "purchase_id" },
+                { label: "Tipe transaksi", key: "type" }
+            ]);
 
-        const reports = await reportReq.json();
-
-        console.log(reports.data);
+            const reportReq = await fetch('/api/item/print', {
+                method: 'POST',
+                body: JSON.stringify({
+                    start : fields.start,
+                    end: fields.end
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            });
+            if(!reportReq.ok) return setStatus('error' + reportReq.status);
+    
+            const reports = await reportReq.json();
+            
+            setData(reports.data);
+        }
+        else if(fields.type == 'gp') {
+            setData([]);
+        }
 
     }
 
@@ -97,13 +124,13 @@ export default function ReportIndex(props) {
 
             <div className="mt-2 mx-4">
 
-                <form onSubmit={printReportHandler.bind(this)}>
+                <form>
                     
                     <div className="flex items-center my-8">
                         <span className="mx-4 text-gray-500 w-1/12">Document</span>
                         <select onChange={fieldHandler.bind(this)} name="type" className="bg-gray-100 p-2 rounded-md">
                             <option value="stock">Stock</option>
-                            <option value="gp">Gross Profit</option>
+                            {/* <option value="gp">Gross Profit</option> */}
                         </select>
                     </div>
                     
@@ -127,9 +154,7 @@ export default function ReportIndex(props) {
                     </div>
 
                     <div className="flex flex-col justify-center m-4 mt-8 w-fit">
-                        <button type="submit" className="px-8 bg-sky-700 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded">
-                            Print
-                        </button>
+                        <CSVLink className="px-8 bg-sky-700 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded" data={data} headers={headers} filename={'data.csv'}>Export data</CSVLink>
                     </div>
 
                 </form>
