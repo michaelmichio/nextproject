@@ -7,14 +7,13 @@ import Swal from "sweetalert2";
 import { authPage } from "@/middlewares/authorizationPage";
 import Nav from "@/components/Nav";
 import Sidebar from "@/components/Sidebar";
-import CreateItemModal from "@/components/CreateItemModal";
-import UpdateItemModal from "@/components/UpdateItemModal";
+import CreatePurchaseModal from "@/components/CreatePurchaseModal";
 
 export async function getServerSideProps(ctx) {
 
   const { token } = await authPage(ctx);
 
-  const itemReq = await fetch('http://localhost:3000/api/item', {
+  const purchaseReq = await fetch('http://localhost:3000/api/purchase', {
     headers: {
       'Authorization': 'Bearer ' + token
     }
@@ -23,17 +22,17 @@ export async function getServerSideProps(ctx) {
     console.log(error)
   });
 
-  const items = await itemReq.json();
+  const purchases = await purchaseReq.json();
   
   return {
     props: {
       token,
-      items: items.data
+      items: purchases.data
     }
   }
 }
 
-export default function StockIndex(props) {
+export default function PurchaseIndex(props) {
 
   const notifyInfo = (msg) => toast.info(msg, {
     position: "top-right",
@@ -52,8 +51,6 @@ export default function StockIndex(props) {
   const { items } = props;
 
   const [createModal, setVisibleCreate] = useState(false);
-  const [updateModal, setVisibleUpdate] = useState(false);
-  const [itemData, setItemData] = useState();
 
   async function deleteHandler(id, e) {
     e.preventDefault();
@@ -96,11 +93,11 @@ export default function StockIndex(props) {
       'Data gagal dihapus.',
       'error'
     );
-    deleteItem(id);
+    deletePurchases(id);
   }
 
-  async function deleteItem(id) {
-    const deleteItem = await fetch('/api/item/delete/' + id, {
+  async function deletePurchases(id) {
+    const deletePurchase = await fetch('/api/purchase/delete/' + id, {
       method: 'DELETE',
       body: JSON.stringify({
     }),
@@ -111,7 +108,7 @@ export default function StockIndex(props) {
     .catch((error) => {
       console.log(error)
     });
-    Router.replace('/stock');
+    Router.replace('/purchase');
     Swal.fire(
       'Terhapus!',
       'Data berhasil dihapus.',
@@ -175,42 +172,50 @@ export default function StockIndex(props) {
             <table className="w-full">
               <thead>
                 <tr className="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
-                  <th className="w-3/12 truncate ... px-4 py-3">Kode Barang</th>
-                  <th className="w-3/12 truncate ... px-4 py-3">Nama Barang</th>
-                  <th className="w-3/12 truncate ... px-4 py-3">Harga Satuan</th>
+                  <th className="w-1/10 truncate ... px-4 py-3">No. Dokumen</th>
+                  <th className="w-1/12 truncate ... px-4 py-3">Tanggal</th>
+                  <th className="w-1/10 truncate ... px-4 py-3">Supplier</th>
+                  <th className="w-1/10 truncate ... px-4 py-3">Kode Barang</th>
                   <th className="w-1/12 truncate ... px-4 py-3">Qty</th>
-                  <th className="truncate ... px-4 py-3"></th>
+                  <th className="w-1/10 truncate ... px-4 py-3">Price</th>
+                  <th className="w-1/10 truncate ... px-4 py-3">Gross</th>
+                  <th className="w-1/12 truncate ... px-4 py-3">Disc</th>
+                  <th className="w-1/12 truncate ... px-4 py-3">PPN</th>
+                  <th className="w-1/10 truncate ... px-4 py-3">Total</th>
+                  {/* <th className="truncate ... px-4 py-3"></th> */}
                 </tr>
               </thead>
               <tbody className="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-                { props.items?.filter(items => {
+                { props.items?.filter(item => {
                   const filterId = searchItem.toLowerCase();
-                  const fullId = items.code.toLowerCase();
-                  const fullName = items.name.toLowerCase();
+                  const fullId = item.document_id.toLowerCase();
+                  const fullName = item.supplier.toLowerCase();
+                  const fullItem = item.item_code.toLowerCase();
 
                   if(filterId == '') {
                     return fullId;
                   }
                   else {
-                    return searchItem && fullId.includes(filterId) || searchItem && fullName.includes(filterId);
+                    return searchItem && fullId.includes(filterId) || searchItem && fullName.includes(filterId) || searchItem && fullItem.includes(filterId);
                   }
                 })
-                .slice(page*itemPerPage, (page+1)*itemPerPage).map(items => (
-                    <tr key={ items.id } className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
-                      <td className="w-3/12 truncate ... px-4 py-3 text-sm">{ items.code }</td>
-                      <td className="w-3/12 truncate ... px-4 py-3 text-sm">{ items.name }</td>
-                      <td className="w-3/12 truncate ... px-4 py-3 text-sm">
-                        <CurrencyFormat value={items.price} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} />
-                      </td>
-                      <td className="w-1/12 truncate ... px-4 py-3 text-sm">{ items.stock }</td>
-                      <td className="px-4 py-3 text-sm flex justify-end">
-                        <button onClick={() => {setVisibleUpdate(true); setItemData(items)}} type="button" className="mr-4 px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-sky-700 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>
-                        </button>
-                        <button onClick={deleteHandler.bind(this, items.id)} type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
+                .slice(page*itemPerPage, (page+1)*itemPerPage).map(item => (
+                    <tr key={ item.id } className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
+                      <td className="w-1/10 truncate ... px-4 py-3 text-sm">{ item.document_id }</td>
+                      <td className="w-1/12 truncate ... px-4 py-3 text-sm">{ item.date }</td>
+                      <td className="w-1/10 truncate ... px-4 py-3 text-sm">{ item.supplier }</td>
+                      <td className="w-1/10 truncate ... px-4 py-3 text-sm">{ item.item_code }</td>
+                      <td className="w-1/12 truncate ... px-4 py-3 text-sm">{ item.qty }</td>
+                      <td className="w-1/10 truncate ... px-4 py-3 text-sm"><CurrencyFormat value={item.price} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} /></td>
+                      <td className="w-1/10 truncate ... px-4 py-3 text-sm"><CurrencyFormat value={item.gross} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} /></td>
+                      <td className="w-1/12 truncate ... px-4 py-3 text-sm">{ (item.disc * 100) + '%' }</td>
+                      <td className="w-1/12 truncate ... px-4 py-3 text-sm">{ (item.ppn * 100) + '%' }</td>
+                      <td className="w-1/10 truncate ... px-4 py-3 text-sm"><CurrencyFormat value={item.total} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} /></td>
+                      {/* <td className="px-4 py-3 text-sm flex">
+                        <button onClick={deleteHandler.bind(this, item.id)} type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                         </button>
-                      </td>
+                      </td> */}
                     </tr>
                   ))
                 }
@@ -245,9 +250,7 @@ export default function StockIndex(props) {
       
     </div>
 
-    <CreateItemModal isVisible={createModal} onClose={() => setVisibleCreate(false)} />
-
-    <UpdateItemModal isVisible={updateModal} onClose={() => setVisibleUpdate(false)} notifyInfo={(msg) => notifyInfo(msg)} itemData={itemData} />
+    <CreatePurchaseModal isVisible={createModal} onClose={() => setVisibleCreate(false)} token={token} />
 
   </div>
         

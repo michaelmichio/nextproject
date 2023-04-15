@@ -68,7 +68,6 @@ export default function ReportIndex(props) {
         
         if(fields.type == 'stock') {
             setHeaders([
-                { label: "ID Barang", key: "id" },
                 { label: "Kode Barang", key: "item_code" },
                 { label: "Nama Barang", key: "item_name" },
                 { label: "Jumlah Awal", key: "initial_qty" },
@@ -78,7 +77,8 @@ export default function ReportIndex(props) {
                 { label: "Harga Total", key: "total_price" },
                 { label: "ID Penjualan", key: "order_id" },
                 { label: "ID Pembelian", key: "purchase_id" },
-                { label: "Tipe transaksi", key: "type" }
+                { label: "Tipe", key: "type" },
+                { label: "Tanggal", key: "updated_at" }
             ]);
 
             const reportReq = await fetch('/api/item/print', {
@@ -128,9 +128,9 @@ export default function ReportIndex(props) {
                     
                     <div className="flex items-center my-8">
                         <span className="mx-4 text-gray-500 w-1/12">Document</span>
-                        <select onChange={fieldHandler.bind(this)} name="type" className="bg-gray-100 p-2 rounded-md">
-                            <option value="stock">Stock</option>
-                            {/* <option value="gp">Gross Profit</option> */}
+                        <select onChange={fieldHandler.bind(this)} name="type" id="type" className="bg-gray-100 p-2 rounded-md">
+                            <option value='stock'>Stock</option>
+                            {/* <option value='gp'>Gross Profit</option> */}
                         </select>
                     </div>
                     
@@ -154,7 +154,7 @@ export default function ReportIndex(props) {
                     </div>
 
                     <div className="flex flex-col justify-center m-4 mt-8 w-fit">
-                        <CSVLink className="px-8 bg-sky-700 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded" data={data} headers={headers} filename={'data.csv'}>Export data</CSVLink>
+                        <CSVLink className="px-8 bg-sky-700 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded" data={data} headers={headers} filename={('laporan-' + fields.end +'.csv')}>Export data</CSVLink>
                     </div>
 
                 </form>

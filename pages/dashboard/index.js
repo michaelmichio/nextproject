@@ -139,7 +139,6 @@ export default function DashboardIndex(props) {
                   <th className="w-1/8 truncate ... px-4 py-3">ID Order</th>
                   <th className="w-1/8 truncate ... px-4 py-3">ID Customer</th>
                   <th className="w-1/8 truncate ... px-4 py-3">Nama Customer</th>
-                  <th className="w-1/12 truncate ... px-4 py-3">Jumlah SS</th>
                   <th className="w-1/8 truncate ... px-4 py-3">Tanggal Order</th>
                   <th className="w-1/8 truncate ... px-4 py-3">Total Biaya</th>
                   <th className="w-1/8 truncate ... px-4 py-3">Status</th>
@@ -165,7 +164,6 @@ export default function DashboardIndex(props) {
                       <td className="w-1/8 truncate ... px-4 py-3 text-sm">{ orders.orderId }</td>
                       <td className="w-1/8 truncate ... px-4 py-3 text-sm">{ orders.customerId }</td>
                       <td className="w-1/8 truncate ... px-4 py-3 text-sm">{ orders.customerName }</td>
-                      <td className="w-1/12 truncate ... px-4 py-3 text-sm">{ orders.jumlahSS }</td>
                       <td className="w-1/8 truncate ... px-4 py-3 text-sm">{ orders.orderCreatedAt.substring(0, 10) }</td>
                       <td className="w-1/8 truncate ... px-4 py-3 text-sm">{ (orders.totalBiayaSS + orders.totalBiayaService > 0) ? <CurrencyFormat value={orders.totalBiayaSS + orders.totalBiayaService} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} /> : '0' }</td>
                       <td className="w-1/8 truncate ... px-4 py-3 text-xs">
