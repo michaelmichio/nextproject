@@ -52,6 +52,8 @@ export default function StockIndex(props) {
 
   const { items } = props;
 
+  console.log(items);
+
   const [uploadModal, setVisibleUpload] = useState(false);
   const [createModal, setVisibleCreate] = useState(false);
   const [updateModal, setVisibleUpdate] = useState(false);
@@ -329,10 +331,11 @@ export default function StockIndex(props) {
             <table className="w-full">
               <thead>
                 <tr className="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+                  <th className="w-1/12 truncate ... px-4 py-3">No</th>
                   <th className="w-3/12 truncate ... px-4 py-3">Kode Barang</th>
                   <th className="w-3/12 truncate ... px-4 py-3">Nama Barang</th>
-                  <th className="w-3/12 truncate ... px-4 py-3">Harga Satuan</th>
-                  <th className="w-1/12 truncate ... px-4 py-3">Qty</th>
+                  <th className="w-2/12 truncate ... px-4 py-3">Harga Satuan</th>
+                  <th className="w-2/12 truncate ... px-4 py-3">Qty</th>
                   <th className="truncate ... px-4 py-3"></th>
                 </tr>
               </thead>
@@ -349,14 +352,15 @@ export default function StockIndex(props) {
                     return searchItem && fullId.includes(filterId) || searchItem && fullName.includes(filterId);
                   }
                 })
-                .slice(page*itemPerPage, (page+1)*itemPerPage).map(items => (
+                .slice(page*itemPerPage, (page+1)*itemPerPage).map((items, i) => (
                     <tr key={ items.id } className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
+                      <td className="w-1/12 truncate ... px-4 py-3 text-sm">{(itemPerPage*page)+(i+1)}</td>
                       <td className="w-3/12 truncate ... px-4 py-3 text-sm">{ items.code }</td>
                       <td className="w-3/12 truncate ... px-4 py-3 text-sm">{ items.name }</td>
-                      <td className="w-3/12 truncate ... px-4 py-3 text-sm">
+                      <td className="w-2/12 truncate ... px-4 py-3 text-sm">
                         <CurrencyFormat value={items.price} displayType={'text'} thousandSeparator={true} prefix={'Rp. '} />
                       </td>
-                      <td className="w-1/12 truncate ... px-4 py-3 text-sm">{ items.stock }</td>
+                      <td className="w-2/12 truncate ... px-4 py-3 text-sm">{ items.stock }</td>
                       <td className="px-4 py-3 text-sm flex justify-end">
                         <button onClick={() => updateHandler(items)} type="button" className="mr-4 px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-sky-700 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>
@@ -381,12 +385,12 @@ export default function StockIndex(props) {
             <div className="flex flex-row justify-end mt-1">
               <div className="flex xs:mt-0">
                   <button
-                    onClick={() => (page > 0) ? setPage(page-1) : ''}
+                    onClick={() => (page > 0) ? setPage(page*1-1*1) : ''}
                     className="text-sm bg-gray-300 hover:bg-sky-700 text-white hover:text-white font-semibold py-2 px-4 rounded-l">
                     Prev
                   </button>
                   <button
-                    onClick={() => (page < limit-1) ? setPage(page+1) : ''}
+                    onClick={() => (page < limit-1) ? setPage(page*1+1*1) : ''}
                     className="text-sm bg-gray-300 hover:bg-sky-700 text-white hover:text-white font-semibold py-2 px-4 rounded-r">
                     Next
                   </button>

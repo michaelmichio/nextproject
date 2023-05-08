@@ -136,6 +136,7 @@ export default function DashboardIndex(props) {
             <table className="w-full">
               <thead>
                 <tr className="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+                  <th className="w-1/12 truncate ... px-4 py-3">No</th>
                   <th className="w-1/8 truncate ... px-4 py-3">ID Order</th>
                   <th className="w-1/8 truncate ... px-4 py-3">ID Customer</th>
                   <th className="w-1/8 truncate ... px-4 py-3">Nama Customer</th>
@@ -159,8 +160,9 @@ export default function DashboardIndex(props) {
                       return searchItem && fullId.includes(filterId) || searchItem && fullCustomerId.includes(filterId) || searchItem && fullCustomerName.includes(filterId);
                     }
                   })
-                  .slice(page*itemPerPage, (page+1)*itemPerPage).map(orders => (
+                  .slice(page*itemPerPage, (page+1)*itemPerPage).map((orders, i) => (
                     <tr key={ orders.orderId } className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
+                      <td className="w-1/12 truncate ... px-4 py-3 text-sm">{(itemPerPage*page)+(i+1)}</td>
                       <td className="w-1/8 truncate ... px-4 py-3 text-sm">{ orders.orderId }</td>
                       <td className="w-1/8 truncate ... px-4 py-3 text-sm">{ orders.customerId }</td>
                       <td className="w-1/8 truncate ... px-4 py-3 text-sm">{ orders.customerName }</td>
@@ -205,12 +207,12 @@ export default function DashboardIndex(props) {
             <div className="flex flex-row justify-end mt-1">
               <div className="flex xs:mt-0">
                   <button
-                    onClick={() => (page > 0) ? setPage(page-1) : ''}
+                    onClick={() => (page > 0) ? setPage(page*1-1*1) : ''}
                     className="text-sm bg-gray-300 hover:bg-sky-700 text-white hover:text-white font-semibold py-2 px-4 rounded-l">
                     Prev
                   </button>
                   <button
-                    onClick={() => (page < limit-1) ? setPage(page+1) : ''}
+                    onClick={() => (page < limit-1) ? setPage(page*1+1*1) : ''}
                     className="text-sm bg-gray-300 hover:bg-sky-700 text-white hover:text-white font-semibold py-2 px-4 rounded-r">
                     Next
                   </button>
