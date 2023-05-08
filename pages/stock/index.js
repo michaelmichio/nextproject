@@ -9,6 +9,7 @@ import Nav from "@/components/Nav";
 import Sidebar from "@/components/Sidebar";
 import CreateItemModal from "@/components/CreateItemModal";
 import UpdateItemModal from "@/components/UpdateItemModal";
+import UploadItemModal from "@/components/UploadItemModal";
 
 export async function getServerSideProps(ctx) {
 
@@ -51,6 +52,7 @@ export default function StockIndex(props) {
 
   const { items } = props;
 
+  const [uploadModal, setVisibleUpload] = useState(false);
   const [createModal, setVisibleCreate] = useState(false);
   const [updateModal, setVisibleUpdate] = useState(false);
   const [itemData, setItemData] = useState();
@@ -77,6 +79,66 @@ export default function StockIndex(props) {
     })
   }
 
+  async function uploadHandler() {
+    Swal.fire({
+      title: 'Upload Data',
+      html: `<input autoComplete="new-password" type="password" id="password" class="swal2-input" placeholder="Admin key">`,
+      confirmButtonText: 'Submit',
+      focusConfirm: false,
+      preConfirm: () => {
+        const password = Swal.getPopup().querySelector('#password').value
+        if (!password) {
+          Swal.showValidationMessage(`Invalid admin key`)
+        }
+        return { password: password }
+      }
+    }).then((result) => {
+      try {
+        adminKeyUpload(result.value.password);
+      } catch {}
+    })
+  }
+
+  async function createHandler() {
+    Swal.fire({
+      title: 'Tambah Data',
+      html: `<input autoComplete="new-password" type="password" id="password" class="swal2-input" placeholder="Admin key">`,
+      confirmButtonText: 'Submit',
+      focusConfirm: false,
+      preConfirm: () => {
+        const password = Swal.getPopup().querySelector('#password').value
+        if (!password) {
+          Swal.showValidationMessage(`Invalid admin key`)
+        }
+        return { password: password }
+      }
+    }).then((result) => {
+      try {
+        adminKeyCreate(result.value.password);
+      } catch {}
+    })
+  }
+
+  async function updateHandler(items) {
+    Swal.fire({
+      title: 'Admin Key',
+      html: `<input autoComplete="new-password" type="password" id="password" class="swal2-input" placeholder="Admin key">`,
+      confirmButtonText: 'Submit',
+      focusConfirm: false,
+      preConfirm: () => {
+        const password = Swal.getPopup().querySelector('#password').value
+        if (!password) {
+          Swal.showValidationMessage(`Invalid admin key`)
+        }
+        return { password: password }
+      }
+    }).then((result) => {
+      try {
+        adminKeyUpdate(items, result.value.password);
+      } catch {}
+    })
+  }
+
   async function adminKey(id, key) {
     const keyCheck = await fetch('/api/adminkey', {
       method: 'POST',
@@ -99,11 +161,100 @@ export default function StockIndex(props) {
     deleteItem(id);
   }
 
+  async function adminKeyUpload(key) {
+    const keyCheck = await fetch('/api/adminkey', {
+      method: 'POST',
+      body: JSON.stringify({
+        key: key
+      }),
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      }
+    })
+    .catch((error) => {
+      console.log(error)
+    });
+    if(!keyCheck.ok) return Swal.fire(
+      'Admin key salah!',
+      'Pastikan masukan benar.',
+      'error'
+    );
+    setVisibleUpload(true);
+  }
+
+  async function adminKeyCreate(key) {
+    const keyCheck = await fetch('/api/adminkey', {
+      method: 'POST',
+      body: JSON.stringify({
+        key: key
+      }),
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      }
+    })
+    .catch((error) => {
+      console.log(error)
+    });
+    if(!keyCheck.ok) return Swal.fire(
+      'Admin key salah!',
+      'Pastikan masukan benar.',
+      'error'
+    );
+    setVisibleCreate(true);
+  }
+
+  async function adminKeyUpdate(items, key) {
+    const keyCheck = await fetch('/api/adminkey', {
+      method: 'POST',
+      body: JSON.stringify({
+        key: key
+      }),
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      }
+    })
+    .catch((error) => {
+      console.log(error)
+    });
+    if(!keyCheck.ok) return Swal.fire(
+      'Admin key salah!',
+      'Pastikan masukan benar.',
+      'error'
+    );
+    setItemData(items);
+    setVisibleUpdate(true);
+  }
+
   async function deleteItem(id) {
     const deleteItem = await fetch('/api/item/delete/' + id, {
       method: 'DELETE',
       body: JSON.stringify({
-    }),
+
+      }),
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    })
+    .catch((error) => {
+      console.log(error)
+    });
+    Router.replace('/stock');
+    Swal.fire(
+      'Terhapus!',
+      'Data berhasil dihapus.',
+      'success'
+    )
+  }
+
+  async function addItem() {
+    const addItem = await fetch('/api/item/create' , {
+      method: 'DELETE',
+      body: JSON.stringify({
+        
+      }),
       headers: {
         'Authorization': 'Bearer ' + token
       }
@@ -161,8 +312,11 @@ export default function StockIndex(props) {
             </div>
         </div>
 
-        <div className="flex flex-col justify-center ml-4 mr-4">
-          <button onClick={() => setVisibleCreate(true)} type="button" className="bg-sky-700 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded">
+        <div className="flex flex-row justify-center ml-4 mr-4">
+          <button onClick={() => uploadHandler()} type="button" className="mr-4 bg-sky-700 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded">
+            Upload
+          </button>
+          <button onClick={() => createHandler()} type="button" className="bg-sky-700 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded">
             Tambah
           </button>
         </div>
@@ -204,7 +358,7 @@ export default function StockIndex(props) {
                       </td>
                       <td className="w-1/12 truncate ... px-4 py-3 text-sm">{ items.stock }</td>
                       <td className="px-4 py-3 text-sm flex justify-end">
-                        <button onClick={() => {setVisibleUpdate(true); setItemData(items)}} type="button" className="mr-4 px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-sky-700 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
+                        <button onClick={() => updateHandler(items)} type="button" className="mr-4 px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-sky-700 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>
                         </button>
                         <button onClick={deleteHandler.bind(this, items.id)} type="button" className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-red-400 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300">
@@ -244,6 +398,8 @@ export default function StockIndex(props) {
       </div>
       
     </div>
+
+    <UploadItemModal isVisible={uploadModal} onClose={() => setVisibleUpload(false)} />
 
     <CreateItemModal isVisible={createModal} onClose={() => setVisibleCreate(false)} />
 

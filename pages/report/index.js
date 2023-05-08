@@ -71,7 +71,6 @@ export default function ReportIndex(props) {
                 { label: "Kode Barang", key: "item_code" },
                 { label: "Nama Barang", key: "item_name" },
                 { label: "Jumlah Awal", key: "initial_qty" },
-                { label: "Jumlah Berubah", key: "qty" },
                 { label: "Jumlah Akhir", key: "updated_qty" },
                 { label: "Harga Satuan", key: "price" },
                 { label: "Harga Total", key: "total_price" },

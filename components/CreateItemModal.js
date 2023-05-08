@@ -15,7 +15,8 @@ export default function CreateItemModal({ isVisible, onClose }) {
     const [fields, setFields] = useState({
         code: '',
         name: '',
-        price: ''
+        price: '',
+        stock: ''
     });
 
     async function createItemHandler(e) {
@@ -54,7 +55,9 @@ export default function CreateItemModal({ isVisible, onClose }) {
                     <input required autoComplete="off" onChange={fieldHandler.bind(this)} name="code" id="code" className="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="" />
                     <label htmlFor="name" className="text-gray-800 text-sm font-bold leading-tight tracking-normal">Nama</label>
                     <input required autoComplete="off" onChange={fieldHandler.bind(this)} name="name" id="name" className="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="" />
-                    <label htmlFor="price" className="text-gray-800 text-sm font-bold leading-tight tracking-normal">Penetapan harga jual</label>
+                    <label htmlFor="stock" className="text-gray-800 text-sm font-bold leading-tight tracking-normal">Jumlah</label>
+                    <input required autoComplete="off" onChange={fieldHandler.bind(this)} name="stock" id="stock" className="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="" />
+                    <label htmlFor="price" className="text-gray-800 text-sm font-bold leading-tight tracking-normal">Harga jual satuan</label>
                     <input required autoComplete="off" onChange={fieldHandler.bind(this)} name="price" id="price" className="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="" />
                     <div className="flex items-center justify-end w-full">
                         <button type="submit" className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 transition duration-150 ease-in-out hover:bg-sky-600 bg-sky-700 rounded text-white px-8 py-2 text-sm">Simpan</button>

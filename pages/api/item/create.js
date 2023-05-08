@@ -4,7 +4,7 @@ export default async function handler(req, res) {
     
     if(req.method !== 'POST') return res.status(405).end();
 
-    const { code, name, price } = req.body;
+    const { code, name, price, stock } = req.body;
 
     const registeredItem = await db('items').where({ code: code }).first();
     if(registeredItem) return res.status(409).end();
@@ -13,7 +13,7 @@ export default async function handler(req, res) {
         code,
         name,
         price,
-        stock: 0
+        stock
     });
 
     res.status(200);
