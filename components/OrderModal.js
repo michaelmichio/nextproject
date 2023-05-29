@@ -761,11 +761,11 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
             {ssGroupProps?.map((ssgroup) => {
                 totalSSGroupPrice = 0;
                 return (
-                    <div className='containerPrint'>
+                    <div className=''>
                         <div className='flex flex-col h-screen w-screen pt-6 pl-6 pr-6 uppercase'>
-    
+        
                             <div className=''>LAMPIRAN SUKU CADANG & MATERIAL</div>
-
+        
                             <div className='flex flex-row'>
                                 <div className='flex flex-row w-3/4'>
                                     <div className='flex flex-col w-1/6 normal-case'>
@@ -796,10 +796,10 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                     </div>
                                 </div>
                             </div>
-
+        
                             <hr className="border-1 border-dashed border-black mt-1"/>
                             <hr className="border-1 border-dashed border-black my-1"/>
-
+        
                             <div className='flex flex-row normal-case'>
                                 <div className='w-1/12'>No.</div>
                                 <div className='w-3/12'>Kode</div>
@@ -808,10 +808,10 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                 <div className='w-2/12'>H.Satuan</div>
                                 <div className='w-2/12'>Total</div>
                             </div>
-
+        
                             <hr className="border-1 border-dashed border-black my-1"/>
                             <hr className="border-1 border-dashed border-black mb-1"/>
-
+        
                             {ssProps?.map((ss, i) => {
                                 if(ss.ssGroupId == ssgroup.id) {
                                     totalSSGroupPrice = totalSSGroupPrice + ss.itemTotalPrice;
@@ -826,7 +826,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                                     <div className='w-2/12'><CurrencyFormat value={ss.itemPrice} displayType={'text'} thousandSeparator={true} prefix={''} /></div>
                                                     <div className='w-2/12'><CurrencyFormat value={ss.itemTotalPrice} displayType={'text'} thousandSeparator={true} prefix={''} /></div>
                                                 </div>
-
+        
                                                 <div className='flex flex-row justify-end pt-4'>
                                                     <div className='flex flex-col w-1/12'>
                                                         <div>SUBTOTAL</div>
@@ -878,14 +878,13 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                     );
                                 }
                             })}
-
+        
                         </div>
                     </div>
-                    
                 );
             })}
 
-            <div className='containerPrint'>
+            <div className=''>
                 <div className='flex flex-col h-screen w-screen pt-6 pl-6 pr-6 uppercase'>
                         
                     <div className='flex h-fit flex-row'>
