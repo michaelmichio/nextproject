@@ -131,13 +131,13 @@
 
 @media print {
   @page {
-    size: A4;
+    size: 9.5in 10in;
     margin: 0;
   }
   html, body {
     width: 210mm;
     height: 297mm;
-    font-family: "Serif";
+    font-family: "Calibri";
     font-size: 14px;
   }
   /* ... the rest of the rules ... */
