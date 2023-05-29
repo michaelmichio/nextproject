@@ -756,7 +756,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
     <SSModal isVisible={ssModal} onClose={() => {setVisibleSS(false); setSSGroupRead(false); setSSRead(false);}} ssGroupData={ssGroupData} token={token} orderData={orderData} />
 
     <div className='hidden'>
-        <div className='h-screen bg-white text-black' ref={componentRef}>
+        <div className='max-h-screen bg-white text-black' ref={componentRef}>
         
             {ssGroupProps?.map((ssgroup) => {
                 totalSSGroupPrice = 0;
