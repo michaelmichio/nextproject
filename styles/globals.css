@@ -133,7 +133,7 @@
   @page {
     size: 9.5in 5in;
     margin: 0;
-    size: landscape;
+    size: portrait;
   }
   html, body {
     width: 100vw;
@@ -147,8 +147,8 @@
   }
   .containerPrint{
     width: 100vw;
-    min-height: 100vh;
-    page-break-after: always;
+    min-height: 50vh;
+    /* page-break-after: always; */
   }
   /* ... the rest of the rules ... */
 }
