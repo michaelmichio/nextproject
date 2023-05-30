@@ -131,18 +131,23 @@
 
 @media print {
   @page {
-    size: 9.5in 10in;
+    size: 9.5in 5in;
     margin: 0;
+    size: landscape;
   }
   html, body {
-    width: 100%;
-    height: 100%;
-    padding: 0;
+    width: 100vw;
+    height: 100vh;
     margin: 0;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
+    font-family: "Calibri";
+    font-size: 14px;
+    /* page-break-after: always; */
+  }
+  .containerPrint{
+    width: 100vw;
+    min-height: 100vh;
     page-break-after: always;
   }
   /* ... the rest of the rules ... */

@@ -782,11 +782,12 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
     <SSModal isVisible={ssModal} onClose={() => {setVisibleSS(false); setSSGroupRead(false); setSSRead(false);}} ssGroupData={ssGroupData} token={token} orderData={orderData} />
 
     <div className='hidden'>
-        <div className='h-screen bg-white text-black' ref={componentRef}>
+        <div className='h-full bg-white text-black flex flex-col justify-between' ref={componentRef}>
         
             {ssGroupProps?.map((ssgroup) => {
                 totalSSGroupPrice = 0;
                 return (
+                    <div className='containerPrint'>
                     <div className='flex flex-col h-1/2 w-screen pt-6 pl-6 pr-6 uppercase'>
     
                         <div className=''>LAMPIRAN SUKU CADANG & MATERIAL</div>
@@ -905,10 +906,10 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                         })}
     
                     </div>
-                    
+                    </div>
                 );
             })}
-
+            <div className='containerPrint'>
             <div className='flex flex-col h-1/2 w-screen pt-6 pl-6 pr-6 uppercase'>
                     
                 <div className='flex h-fit flex-row'>
@@ -1061,7 +1062,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                 </div>
 
             </div>
-
+            </div>
         </div>
     </div>
 
