@@ -26,6 +26,7 @@ export default async function handler(req, res) {
             .update({
                 name,
                 price: parseFloat(price),
+                // stock: parseFloat(registeredItem.stock) + parseFloat(stock)
                 stock: parseFloat(registeredItem.stock) + parseFloat(stock)
             });
         }
