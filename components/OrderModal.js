@@ -930,8 +930,9 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                 <div className='flex h-fit flex-row'>
                     <div className='flex flex-col justify-end w-1/3 text-xs'>
                         <div>PT. RADITA AUTOPRIMA</div>
-                        <div>JL. ABDULRACHMAN SALEH 64</div>
-                        <div>Telp : 022 6011217 . FAX : 022 6020938</div>
+                        <div>Jl. Soekarno Hatta No.547</div>
+                        <div>Gumuruh, Kec. Batununggal, Bandung 40275</div>
+                        <div>Telp. 0851 0006 2066</div>
                     </div>
                     <div className='flex flex-col justify-end w-1/3 h-full text-center text-lg align-bottom font-bold'>
                         KAISAR PLAZA
