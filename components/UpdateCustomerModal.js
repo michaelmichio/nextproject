@@ -38,9 +38,65 @@ export default function UpdateCustomerModal({ isVisible, onClose, notifyInfo, cu
 
     function fieldHandler(e) {
         const name = e.target.getAttribute('name');
+
+        let text = e.target.value;
+        let filteredText = '';
+
+        if(name === 'name') {
+            if(text.startsWith(' ')) {
+                filteredText = text.trimStart();
+            }
+            else if(text.length <= 32) {
+                // Menghapus karakter selain huruf dan spasi
+                const sanitizedText = text.replace(/[^a-zA-Z\s]/g, '');
+                
+                // Mengubah setiap kata menjadi huruf kapital di awal
+                const capitalizedText = sanitizedText.replace(/\b\w/g, (char) => char.toUpperCase());
+                
+                // Menghapus double spasi
+                const singleSpacedText = capitalizedText.replace(/\s+/g, ' ');
+
+                filteredText = singleSpacedText;
+            }
+            else {
+                filteredText = fields.name;
+            }
+        }
+        if(name === 'address') {
+            if(text.startsWith(' ')) {
+                filteredText = text.trimStart();
+            }
+            else if(text.length <= 108) {
+                // Mengubah setiap kata menjadi huruf kapital di awal
+                const capitalizedText = text.split(' ').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                
+                // Menghapus double spasi
+                const singleSpacedText = capitalizedText.replace(/\s+/g, ' ');
+
+                filteredText = singleSpacedText;
+            }
+            else {
+                filteredText = fields.address;
+            }
+        }
+        else if(name === 'phone') {
+            if(text.startsWith(' ')) {
+                filteredText = text.trimStart();
+            }
+            else if(text.length <= 18) {
+                // Menerapkan regex untuk menghapus karakter selain angka dan simbol '+'
+                const sanitizedText = text.replace(/[^0-9+]/g, '');
+
+                filteredText = sanitizedText;
+            }
+            else {
+                filteredText = fields.phone;
+            }
+        }
+
         setFields({
             ...fields,
-            [name]: e.target.value
+            [name]: filteredText
         });
     }
 
@@ -52,11 +108,11 @@ export default function UpdateCustomerModal({ isVisible, onClose, notifyInfo, cu
             <div className="relative py-8 px-5 md:px-10 bg-white shadow-md rounded border border-gray-400">
                 <form onSubmit={updateCustomerHandler.bind(this)} action="">
                     <label htmlFor="name" className="text-gray-800 text-sm font-bold leading-tight tracking-normal">Nama</label>
-                    <input required autoComplete="off" onChange={fieldHandler.bind(this)} name="name" id="name" className="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" defaultValue={customerData.name} />
+                    <input required autoComplete="off" onChange={fieldHandler.bind(this)} name="name" value={fields.name} id="name" className="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" defaultValue={customerData.name} />
                     <label htmlFor="address" className="text-gray-800 text-sm font-bold leading-tight tracking-normal">Alamat</label>
-                    <input required autoComplete="off" onChange={fieldHandler.bind(this)} name="address" id="address" className="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" defaultValue={customerData.address} />
+                    <input required autoComplete="off" onChange={fieldHandler.bind(this)} name="address" value={fields.address} id="address" className="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" defaultValue={customerData.address} />
                     <label htmlFor="phone" className="text-gray-800 text-sm font-bold leading-tight tracking-normal">Nomor Telepon</label>
-                    <input required autoComplete="off" onChange={fieldHandler.bind(this)} name="phone" id="phone" className="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" defaultValue={customerData.phone} />
+                    <input required autoComplete="off" onChange={fieldHandler.bind(this)} name="phone" value={fields.phone} id="phone" className="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" defaultValue={customerData.phone} />
                     <div className="flex items-center justify-end w-full">
                         <button type="submit" className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 transition duration-150 ease-in-out hover:bg-sky-600 bg-sky-700 rounded text-white px-8 py-2 text-sm">Simpan</button>
                         <button type="button" onClick={closeHandler.bind(this)} className="focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-gray-400 ml-3 bg-gray-100 transition duration-150 text-gray-600 ease-in-out hover:border-gray-400 hover:bg-gray-300 border rounded px-8 py-2 text-sm">Batal</button>

@@ -11,7 +11,7 @@ exports.up = function(knex) {
         table.float('itemCount', 14, 2);
         table.float('itemPrice', 14, 2);
         table.float('itemTotalPrice', 14, 2);
-        table.string('ssGroupId')
+        table.string('ssGroupId');
         table.string('orderId');
         table.timestamps(true, true);
       });

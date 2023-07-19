@@ -41,9 +41,56 @@ export default function Register() {
 
     function fieldHandler(e) {
         const name = e.target.getAttribute('name');
+
+        let text = e.target.value;
+        let filteredText = '';
+
+        if(name === 'username') {
+            if(text.length <= 18) {
+                // Menghapus karakter selain huruf dan angka
+                const sanitizedText = text.replace(/[^a-z0-9]/g, '');
+
+                filteredText = sanitizedText;
+            }
+            else {
+                filteredText = fields.username;
+            }
+        }
+        else if(name === 'password') {
+            if(text.length <= 18) {
+                filteredText = text;
+            }
+            else {
+                filteredText = fields.password;
+            }
+        }
+        else if(name === 'name') {
+            if(text.startsWith(' ')) {
+                filteredText = text.trimStart();
+            }
+            else if(text.length <= 18) {
+                // Menghapus karakter selain huruf dan spasi
+                const sanitizedText = text.replace(/[^a-zA-Z\s]/g, '');
+                
+                // Mengubah setiap kata menjadi huruf kapital di awal
+                const capitalizedText = sanitizedText.replace(/\b\w/g, (char) => char.toUpperCase());
+                
+                // Menghapus double spasi
+                const singleSpacedText = capitalizedText.replace(/\s+/g, ' ');
+
+                filteredText = singleSpacedText;
+            }
+            else {
+                filteredText = fields.name;
+            }
+        }
+        else if(name === 'admkey') {
+            filteredText = text;
+        }
+
         setFields({
             ...fields,
-            [name]: e.target.value
+            [name]: filteredText
         });
     }
 
@@ -59,19 +106,19 @@ export default function Register() {
                     <form className="mt-6" onSubmit={registerHandler.bind(this)}>
                         <div>
                             <label className="block text-gray-700">Username</label>
-                            <input onChange={fieldHandler.bind(this)} type="text" name="username" placeholder="Enter Username" className="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autoFocus autoComplete="false" required/>
+                            <input value={fields.username} onChange={fieldHandler.bind(this)} type="text" name="username" minLength="4" maxLength="18" placeholder="Enter Username" className="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autoFocus autoComplete="false" required/>
                         </div>
                         <div className="mt-4">
                             <label className="block text-gray-700">Password</label>
-                            <input onChange={fieldHandler.bind(this)} type="password" name="password" placeholder="Enter Password" minLength="6" className="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autoComplete="new-password" required/>
+                            <input value={fields.password} onChange={fieldHandler.bind(this)} type="password" name="password" minLength="6" maxLength="18" placeholder="Enter Password" className="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autoComplete="new-password" required/>
                         </div>
                         <div>
                             <label className="block text-gray-700">Name</label>
-                            <input onChange={fieldHandler.bind(this)} type="text" name="name" placeholder="Enter Name" className="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autoFocus autoComplete="false" required/>
+                            <input value={fields.name} onChange={fieldHandler.bind(this)} type="text" name="name" minLength="1" maxLength="18" placeholder="Enter Name" className=" w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autoFocus autoComplete="false" required/>
                         </div>
                         <div>
                             <label className="block text-gray-700">Admin Key</label>
-                            <input onChange={fieldHandler.bind(this)} type="password" name="admkey" placeholder="Enter Admin Key" className="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autoFocus autoComplete="false" required/>
+                            <input value={fields.admkey} onChange={fieldHandler.bind(this)} type="password" name="admkey" placeholder="Enter Admin Key" className="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autoFocus autoComplete="false" required/>
                         </div>
                         <div className="text-center text-red-500 mt-6">
                             {(registerStatus == '') ? <br/> : registerStatus }
@@ -86,94 +133,6 @@ export default function Register() {
                 </div>
             </div>
         </section>
-
-    // <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8">
-    //     <div className="mx-auto max-w-lg">
-    //         <form
-    //         onSubmit={registerHandler.bind(this)}
-    //         action=""
-    //         className="mt-6 mb-0 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8"
-    //         >
-    //             <p className="text-center text-lg font-medium">Create an account</p>
-                
-    //             <div>
-    //                 <label className="sr-only">Username</label>
-    //                 <div className="relative">
-    //                     <input
-    //                     required
-    //                     autoComplete="off"
-    //                     onChange={fieldHandler.bind(this)}
-    //                     name="username"
-    //                     type="text"
-    //                     className="w-full rounded-lg border-gray-200 p-4 pr-12 text-sm shadow-sm"
-    //                     placeholder="Enter username"
-    //                     />
-    //                 </div>
-    //             </div>
-                
-    //             <div>
-    //                 <label className="sr-only">Password</label>
-    //                 <div className="relative">
-    //                     <input
-    //                     required
-    //                     autoComplete="new-password"
-    //                     onChange={fieldHandler.bind(this)}
-    //                     name="password"
-    //                     type="password"
-    //                     className="w-full rounded-lg border-gray-200 p-4 pr-12 text-sm shadow-sm"
-    //                     placeholder="Enter password"
-    //                     />
-    //                 </div>
-    //             </div>
-
-    //             <div>
-    //                 <label className="sr-only">Name</label>
-    //                 <div className="relative">
-    //                     <input
-    //                     required
-    //                     autoComplete="off"
-    //                     onChange={fieldHandler.bind(this)}
-    //                     name="name"
-    //                     type="text"
-    //                     className="w-full rounded-lg border-gray-200 p-4 pr-12 text-sm shadow-sm"
-    //                     placeholder="Enter name"
-    //                     />
-    //                 </div>
-    //             </div>
-
-    //             <div>
-    //                 <label className="sr-only">Admin key</label>
-    //                 <div className="relative">
-    //                     <input
-    //                     required
-    //                     autoComplete="off"
-    //                     onChange={fieldHandler.bind(this)}
-    //                     name="admkey"
-    //                     type="password"
-    //                     className="w-full rounded-lg border-gray-200 p-4 pr-12 text-sm shadow-sm"
-    //                     placeholder="Enter admin key"
-    //                     />
-    //                 </div>
-    //             </div>
-
-    //             <p className="text-center text-sm text-red-500">
-    //                 {(registerStatus == '') ? <br/> : registerStatus }
-    //             </p>
-                
-    //             <button
-    //             type="submit"
-    //             className="block w-full rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white"
-    //             >
-    //                 Register
-    //             </button>
-                
-    //             <p className="text-center text-sm text-gray-500">
-    //                 <Link className="underline" href="/auth/login">Log in</Link>
-    //             </p>
-    //         </form>
-        
-    //     </div>
-    // </div>
 
     );
 

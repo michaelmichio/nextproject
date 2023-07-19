@@ -80,7 +80,10 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
     async function createSSGroupHandler() {
         const createSSGroupReq = await fetch('/api/ssgroup/create', {
             method: 'POST',
-            body: JSON.stringify(orderData),
+            body: JSON.stringify({
+                nomorKuitansi: fields.nomorKuitansi,
+                orderId: orderData.orderId
+            }),
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -317,6 +320,18 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
         onClose();
     }
 
+    // buat kuitansi baru
+    const [fields, setFields] = useState({
+        nomorKuitansi: ''
+    });
+    function fieldHandler(e) {
+        const name = e.target.getAttribute('name');
+        setFields({
+            ...fields,
+            [name]: e.target.value
+        });
+    }
+
     return(
     <>
 
@@ -549,24 +564,24 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
 
                         <hr className="mt-1 border-b-1 border-gray-300"/>
 
-                        <h6 className="text-gray-400 text-sm mt-3 font-bold uppercase">
-                            Informasi SS
+                        <h6 className="text-gray-400 text-sm mt-3 mb-6 font-bold uppercase">
+                            Informasi Kuitansi
                         </h6>
 
                         <div className="mx-4">
-                            <div className="flex flex-wrap">
-                                <div className="w-full lg:w-10/12 px-4" />
+                            <div className="flex flex-wrap mb-4">
+                                <div className="w-full lg:w-10/12 px-4">
+                                    <label className="block uppercase text-gray-600 text-xs font-bold mb-2" >
+                                        Nomor Kuitansi:
+                                    </label>
+                                    <input required autoComplete="off" onChange={fieldHandler.bind(this)} name="nomorKuitansi" type="text" className="border-0 px-3 py-3 placeholder-gray-300 text-gray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" />
+                                </div>
                                 <div className="w-full lg:w-2/12 px-4">
+                                    <label className="block uppercase text-gray-600 text-xs font-bold mb-2" >
+                                        <br/>
+                                    </label>
                                     <div className="relative w-full mb-3">
-                                        <label className="block uppercase text-gray-600 text-xs font-bold mb-2" >
-                                            <br/>
-                                        </label>
-                                        <div className={
-                                            (isPrinted) ?
-                                            "text-center flex justify-end px-2 py-2 hidden"
-                                            :
-                                            ssGroupProps?.length > 0 ? "text-center flex justify-end px-2 py-2 hidden" : "text-center flex justify-end px-2 py-2"
-                                            }>
+                                        <div className={ssGroupProps?.length > 0 ? "text-center flex justify-end px-2 py-2 hidden" : "text-center flex justify-end px-2 py-2"}>
                                             <button onClick={() => createSSGroupHandler()} type="button" className="bg-sky-700 hover:bg-sky-600 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150">
                                                 Tambah
                                             </button>
@@ -580,8 +595,8 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                         <thead>
                                             <tr className="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
                                                 <th className="w-1/12 truncate ... px-4 py-3">No.</th>
-                                                <th className="w-4/12 truncate ... px-4 py-3">Nomor SS</th>
-                                                <th className="w-4/12 truncate ... px-4 py-3">Tanggal SS</th>
+                                                <th className="w-4/12 truncate ... px-4 py-3">Nomor Kuitansi</th>
+                                                <th className="w-4/12 truncate ... px-4 py-3">Tanggal Kuitansi</th>
                                                 <th className="truncate ... px-4 py-3"></th>
                                             </tr>
                                         </thead>
@@ -814,7 +829,7 @@ export default function OrderModal({ isVisible, onClose, orderData, token }) {
                                     <div>Tanggal</div>
                                     <div>Waktu</div>
                                 </div>
-                                <div className='flex flex-col w-2/3'>
+                                <div className='flex flex-col wsgroupid-2/3'>
                                     <div>: {orderData.nomorSPK}</div>
                                     <div>: {orderData.orderId}</div>
                                     <div>: {('0' + d.getDate()).slice(-2)+'/'+('0' + d.getMonth()).slice(-2)+'/'+d.getFullYear()}</div>

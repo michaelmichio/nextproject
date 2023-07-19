@@ -334,8 +334,8 @@ export default function StockIndex(props) {
                   <th className="w-1/12 truncate ... px-4 py-3">No</th>
                   <th className="w-3/12 truncate ... px-4 py-3">Kode Barang</th>
                   <th className="w-3/12 truncate ... px-4 py-3">Nama Barang</th>
-                  <th className="w-2/12 truncate ... px-4 py-3">Harga Satuan</th>
-                  <th className="w-2/12 truncate ... px-4 py-3">Qty</th>
+                  <th className="w-2/12 truncate ... px-4 py-3">Harga Beli Satuan</th>
+                  <th className="w-2/12 truncate ... px-4 py-3">Jumlah Tersedia</th>
                   <th className="truncate ... px-4 py-3"></th>
                 </tr>
               </thead>

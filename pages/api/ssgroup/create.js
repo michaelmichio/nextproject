@@ -4,11 +4,9 @@ export default async function handler(req, res) {
     
     if(req.method !== 'POST') return res.status(405).end();
 
-    const { orderId } = req.body;
+    const { nomorKuitansi, orderId } = req.body;
 
-    // const d = new Date();
-    // const id = '3' + ('0' + d.getYear()).slice(-2) + ('0' + d.getMonth()).slice(-2) + ('0' + d.getDate()).slice(-2) + ('0' + d.getHours()).slice(-2) + ('0' + d.getMinutes()).slice(-2) + ('0' + d.getSeconds()).slice(-2);
-    const id = orderId;
+    const id = nomorKuitansi;
     
     const createSSGroup = await db('ssgroups').insert({
         id,

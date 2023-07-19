@@ -216,14 +216,14 @@ export default function SSModal({ isVisible, onClose, ssGroupData, token, orderD
                             {/* Start - Main Content */}
                             
                             <h6 className="text-gray-400 text-sm mt-3 mb-6 font-bold uppercase">
-                                Informasi SS
+                                Informasi Kuitansi
                             </h6>
 
                             <div className="flex flex-wrap justify-between">
                                 <div className="w-full lg:w-1/12 px-4">
                                     <div className="relative w-full mb-3">
                                         <label className="block uppercase text-gray-600 text-xs font-bold mb-2" >
-                                            Nomor SS :
+                                            Nomor Kuitansi :
                                         </label>
                                     </div>
                                 </div>
