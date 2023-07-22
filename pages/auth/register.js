@@ -112,13 +112,13 @@ export default function Register() {
                             <label className="block text-gray-700">Password</label>
                             <input value={fields.password} onChange={fieldHandler.bind(this)} type="password" name="password" minLength="6" maxLength="18" placeholder="Enter Password" className="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autoComplete="new-password" required/>
                         </div>
-                        <div>
+                        <div className="mt-4">
                             <label className="block text-gray-700">Name</label>
-                            <input value={fields.name} onChange={fieldHandler.bind(this)} type="text" name="name" minLength="1" maxLength="18" placeholder="Enter Name" className=" w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autoFocus autoComplete="false" required/>
+                            <input value={fields.name} onChange={fieldHandler.bind(this)} type="text" name="name" minLength="1" maxLength="18" placeholder="Enter Name" className=" w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autoComplete="false" required/>
                         </div>
-                        <div>
+                        <div className="mt-4">
                             <label className="block text-gray-700">Admin Key</label>
-                            <input value={fields.admkey} onChange={fieldHandler.bind(this)} type="password" name="admkey" placeholder="Enter Admin Key" className="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autoFocus autoComplete="false" required/>
+                            <input value={fields.admkey} onChange={fieldHandler.bind(this)} type="password" name="admkey" placeholder="Enter Admin Key" className="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autoComplete="false" required/>
                         </div>
                         <div className="text-center text-red-500 mt-6">
                             {(registerStatus == '') ? <br/> : registerStatus }

@@ -22,21 +22,19 @@ export default async function handler(req, res) {
     // lakukan hash untuk password
     const salt = bcrypt.genSaltSync(10);
     const password2 = bcrypt.hashSync(password, salt);
-    // role id
-    const roleId = '1';
 
     // insert data ke database
     const register = await db('users').insert({
         username: username2,
         password: password2,
         name: name2,
-        roleId: roleId
+        id_role: '1'
     });
 
     // return sukses
     res.status(200);
     res.json({
-        message: 'User registered successfully'
+        message: 'User registered successfully.'
     });
     
 }

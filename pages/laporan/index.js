@@ -21,7 +21,7 @@ function parseJwt(token) {
     }
 }
 
-export default function CustomerIndex(props) {
+export default function LaporanIndex(props) {
 
     const { token } = props;
 
@@ -31,7 +31,7 @@ export default function CustomerIndex(props) {
 
         <div>
             <Navbar />
-            <Sidebar currentPage={'customer'} />
+            <Sidebar currentPage={'laporan'} />
         </div>
 
     );

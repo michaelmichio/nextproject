@@ -29,7 +29,6 @@ export default function Login() {
         if(!loginReq.ok) return setLoginStatus('Pengguna tidak ditemukan');
         const loginRes = await loginReq.json();
         Cookie.set('token', loginRes.token);
-        Cookie.set('username', loginRes.userData.name);
         Router.replace('/dashboard');
     }
 
@@ -58,7 +57,7 @@ export default function Login() {
                     <form className="mt-6" onSubmit={loginHandler.bind(this)}>
                         <div>
                             <label className="block text-gray-700">Username</label>
-                            <input onChange={fieldHandler.bind(this)} type="text" name="username" placeholder="Enter Username" className="lowercase w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autoFocus autoComplete="true" required/>
+                            <input onChange={fieldHandler.bind(this)} type="text" name="username" placeholder="Enter Username" className="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autoFocus autoComplete="true" required/>
                         </div>
                         <div className="mt-4">
                             <label className="block text-gray-700">Password</label>
